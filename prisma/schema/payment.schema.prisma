@@ -1,0 +1,45 @@
+enum DiscountType {
+  PERCENT
+  FIXED_AMOUNT
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  CARD
+  MOMO
+}
+
+enum PaymentType {
+  DEPOSIT
+  FINAL_PAYMENT
+  REFUND
+}
+
+model Voucher {
+  id               String       @id @default(uuid(7)) @db.Uuid
+  code             String       @unique
+  discountType     DiscountType
+  discountValue    Decimal      @db.Decimal(10, 2)
+  minInvoiceAmount Decimal      @db.Decimal(10, 2)
+  validFrom        DateTime
+  validUntil       DateTime
+  usageLimit       Int?
+
+  @@map("vouchers")
+}
+
+model Payment {
+  id              String        @id @default(uuid(7)) @db.Uuid
+  invoiceId       String?       @db.Uuid
+  bookingId       String?       @db.Uuid
+  amount          Decimal       @db.Decimal(10, 2)
+  paymentMethod   PaymentMethod
+  paymentType     PaymentType
+  transactionTime DateTime      @default(now())
+
+  invoice Invoice? @relation(fields: [invoiceId], references: [id])
+  booking Booking? @relation(fields: [bookingId], references: [id])
+
+  @@map("payments")
+}
