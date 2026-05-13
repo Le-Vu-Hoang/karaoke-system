@@ -1,0 +1,21 @@
+model Booking {
+  id               Int           @id @default(autoincrement())
+  customerId       Int?
+  guestName        String?
+  guestPhone       String?
+  roomTypeId       Int
+  roomId           Int?
+  bookingTime      DateTime
+  durationExpected Int
+  status           BookingStatus @default(PENDING)
+  deposit          Decimal?      @default(0) @db.Decimal(10, 2)
+  createdAt        DateTime      @default(now())
+
+  customer User?     @relation("CustomerBookings", fields: [customerId], references: [id])
+  roomType RoomType  @relation(fields: [roomTypeId], references: [id])
+  room     Room?     @relation(fields: [roomId], references: [id])
+  invoices Invoice[]
+  payments Payment[]
+
+  @@map("bookings")
+}
