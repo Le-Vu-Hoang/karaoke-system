@@ -1,0 +1,309 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  ARRIVED
+}
+
+enum InvoiceStatus {
+  UNPAID
+  PAID
+}
+
+model Booking {
+  id               String        @id @default(uuid(7)) @db.Uuid
+  customerId       String?       @db.Uuid
+  guestName        String?
+  guestPhone       String?
+  roomTypeId       String        @db.Uuid
+  roomId           String?       @db.Uuid
+  bookingTime      DateTime
+  durationExpected Int
+  status           BookingStatus @default(PENDING)
+  deposit          Decimal?      @default(0) @db.Decimal(10, 2)
+  createdAt        DateTime      @default(now())
+
+  customer User?     @relation("CustomerBookings", fields: [customerId], references: [id])
+  roomType RoomType  @relation(fields: [roomTypeId], references: [id])
+  room     Room?     @relation(fields: [roomId], references: [id])
+  invoices Invoice[]
+  payments Payment[]
+
+  @@map("bookings")
+}
+
+model Invoice {
+  id            String        @id @default(uuid(7)) @db.Uuid
+  bookingId     String?       @db.Uuid
+  roomId        String        @db.Uuid
+  staffId       String        @db.Uuid
+  startTime     DateTime      @default(now())
+  endTime       DateTime?
+  roomTotal     Decimal       @default(0) @db.Decimal(10, 2)
+  servicesTotal Decimal       @default(0) @db.Decimal(10, 2)
+  discount      Decimal       @default(0) @db.Decimal(10, 2)
+  finalTotal    Decimal       @default(0) @db.Decimal(10, 2)
+  status        InvoiceStatus @default(UNPAID)
+
+  booking      Booking?         @relation(fields: [bookingId], references: [id])
+  room         Room             @relation(fields: [roomId], references: [id])
+  staff        User             @relation("StaffInvoices", fields: [staffId], references: [id])
+  invoiceItems InvoiceService[]
+  payments     Payment[]
+
+  @@map("invoices")
+}
+
+model InvoiceService {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  invoiceId   String   @db.Uuid
+  serviceId   String   @db.Uuid
+  quantity    Int
+  priceAtTime Decimal  @db.Decimal(10, 2)
+  orderTime   DateTime @default(now())
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [serviceId], references: [id])
+
+  @@map("invoice_services")
+}
+
+enum InventoryChangeType {
+  IMPORT
+  SALE
+  DAMAGE
+}
+
+model ServiceCategory {
+  id           String  @id @default(uuid(7)) @db.Uuid
+  name         String  @unique
+  description  String? @db.Text
+  displayOrder Int     @default(0)
+  isActive     Boolean @default(true)
+
+  services Service[]
+
+  @@map("service_categories")
+}
+
+model Service {
+  id            String  @id @default(uuid(7)) @db.Uuid
+  categoryId    String  @db.Uuid
+  name          String
+  price         Decimal @db.Decimal(10, 2)
+  stockQuantity Int     @default(0)
+  isActive      Boolean @default(true)
+
+  category      ServiceCategory  @relation(fields: [categoryId], references: [id])
+  invoiceItems  InvoiceService[]
+  inventoryLogs InventoryLog[]
+
+  @@map("services")
+}
+
+model Supplier {
+  id          String @id @default(uuid(7)) @db.Uuid
+  name        String
+  phoneNumber String
+
+  purchaseOrders PurchaseOrder[]
+
+  @@map("suppliers")
+}
+
+model PurchaseOrder {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  supplierId  String   @db.Uuid
+  staffId     String   @db.Uuid
+  totalAmount Decimal  @db.Decimal(10, 2)
+  orderDate   DateTime @default(now())
+
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+  staff    User     @relation("StaffPurchaseOrders", fields: [staffId], references: [id])
+
+  @@map("purchase_orders")
+}
+
+model InventoryLog {
+  id              String              @id @default(uuid(7)) @db.Uuid
+  serviceId       String              @db.Uuid
+  changeType      InventoryChangeType
+  quantityChanged Int
+  referenceId     String?             @db.Uuid
+  createdAt       DateTime            @default(now())
+
+  service Service @relation(fields: [serviceId], references: [id])
+
+  @@map("inventory_logs")
+}
+
+enum DiscountType {
+  PERCENT
+  FIXED_AMOUNT
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  CARD
+  MOMO
+}
+
+enum PaymentType {
+  DEPOSIT
+  FINAL_PAYMENT
+  REFUND
+}
+
+model Voucher {
+  id               String       @id @default(uuid(7)) @db.Uuid
+  code             String       @unique
+  discountType     DiscountType
+  discountValue    Decimal      @db.Decimal(10, 2)
+  minInvoiceAmount Decimal      @db.Decimal(10, 2)
+  validFrom        DateTime
+  validUntil       DateTime
+  usageLimit       Int?
+
+  @@map("vouchers")
+}
+
+model Payment {
+  id              String        @id @default(uuid(7)) @db.Uuid
+  invoiceId       String?       @db.Uuid
+  bookingId       String?       @db.Uuid
+  amount          Decimal       @db.Decimal(10, 2)
+  paymentMethod   PaymentMethod
+  paymentType     PaymentType
+  transactionTime DateTime      @default(now())
+
+  invoice Invoice? @relation(fields: [invoiceId], references: [id])
+  booking Booking? @relation(fields: [bookingId], references: [id])
+
+  @@map("payments")
+}
+
+enum RoomStatus {
+  AVAILABLE
+  IN_USE
+  MAINTENANCE
+}
+
+model RoomType {
+  id               String  @id @default(uuid(7)) @db.Uuid
+  name             String
+  capacity         Int
+  basePricePerHour Decimal @db.Decimal(10, 2)
+  description      String? @db.Text
+
+  rooms      Room[]
+  bookings   Booking[]
+  priceRules PriceRule[]
+
+  @@map("room_types")
+}
+
+model Room {
+  id         String     @id @default(uuid(7)) @db.Uuid
+  roomTypeId String     @db.Uuid
+  roomNumber String     @unique
+  status     RoomStatus @default(AVAILABLE)
+
+  roomType   RoomType    @relation(fields: [roomTypeId], references: [id])
+  bookings   Booking[]
+  invoices   Invoice[]
+  equipments Equipment[]
+
+  @@map("rooms")
+}
+
+model PriceRule {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  roomTypeId   String   @db.Uuid
+  dayOfWeek    Int
+  startTime    DateTime @db.Time()
+  endTime      DateTime @db.Time()
+  pricePerHour Decimal  @db.Decimal(10, 2)
+
+  roomType RoomType @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+
+  @@map("price_rules")
+}
+
+enum EquipmentStatus {
+  ACTIVE
+  REPAIRING
+  BROKEN
+}
+
+model Shift {
+  id           String    @id @default(uuid(7)) @db.Uuid
+  staffId      String    @db.Uuid
+  startTime    DateTime  @default(now())
+  endTime      DateTime?
+  startingCash Decimal   @db.Decimal(10, 2)
+  endingCash   Decimal?  @db.Decimal(10, 2)
+  expectedCash Decimal?  @db.Decimal(10, 2)
+
+  staff User @relation("StaffShifts", fields: [staffId], references: [id])
+
+  @@map("shifts")
+}
+
+model Equipment {
+  id           String          @id @default(uuid(7)) @db.Uuid
+  roomId       String          @db.Uuid
+  name         String
+  serialNumber String?         @unique
+  status       EquipmentStatus @default(ACTIVE)
+
+  room         Room             @relation(fields: [roomId], references: [id])
+  maintenances MaintenanceLog[]
+
+  @@map("equipments")
+}
+
+model MaintenanceLog {
+  id              String   @id @default(uuid(7)) @db.Uuid
+  equipmentId     String   @db.Uuid
+  maintenanceDate DateTime @default(now())
+  description     String   @db.Text
+  cost            Decimal  @db.Decimal(10, 2)
+
+  equipment Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+
+  @@map("maintenance_logs")
+}
+
+enum Role {
+  CUSTOMER
+  STAFF
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  fullName     String
+  phoneNumber  String   @unique
+  email        String?  @unique
+  passwordHash String
+  refreshToken String?  @unique
+  role         Role     @default(CUSTOMER)
+  createdAt    DateTime @default(now())
+
+  bookings       Booking[]       @relation("CustomerBookings")
+  invoices       Invoice[]       @relation("StaffInvoices")
+  purchaseOrders PurchaseOrder[] @relation("StaffPurchaseOrders")
+  shifts         Shift[]         @relation("StaffShifts")
+
+  @@map("users")
+}

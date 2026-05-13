@@ -1,0 +1,46 @@
+enum RoomStatus {
+  AVAILABLE
+  IN_USE
+  MAINTENANCE
+}
+
+model RoomType {
+  id               String  @id @default(uuid(7)) @db.Uuid
+  name             String
+  capacity         Int
+  basePricePerHour Decimal @db.Decimal(10, 2)
+  description      String? @db.Text
+
+  rooms      Room[]
+  bookings   Booking[]
+  priceRules PriceRule[]
+
+  @@map("room_types")
+}
+
+model Room {
+  id         String     @id @default(uuid(7)) @db.Uuid
+  roomTypeId String     @db.Uuid
+  roomNumber String     @unique
+  status     RoomStatus @default(AVAILABLE)
+
+  roomType   RoomType    @relation(fields: [roomTypeId], references: [id])
+  bookings   Booking[]
+  invoices   Invoice[]
+  equipments Equipment[]
+
+  @@map("rooms")
+}
+
+model PriceRule {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  roomTypeId   String   @db.Uuid
+  dayOfWeek    Int
+  startTime    DateTime @db.Time()
+  endTime      DateTime @db.Time()
+  pricePerHour Decimal  @db.Decimal(10, 2)
+
+  roomType RoomType @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+
+  @@map("price_rules")
+}
