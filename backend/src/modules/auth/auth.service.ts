@@ -11,6 +11,7 @@ import bcrypt from 'bcrypt';
 import { randomBytes } from 'node:crypto';
 import { JwtService } from '@nestjs/jwt';
 import { Prisma } from '@prisma/client';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -115,6 +116,38 @@ export class AuthService {
 				id: user.id,
 				fullName: user.fullName,
 				phoneNumber: user.phoneNumber,
+				role: user.role,
+			},
+		};
+	}
+
+	async logout(userId: string): Promise<void> {
+		await this.prisma.user.update({
+			where: { id: userId },
+			data: { refreshToken: null },
+		});
+	}
+
+	async login(loginDto: LoginDto): Promise<AuthResponseDto> {
+		const { phoneNumber, password } = loginDto;
+
+		const user = await this.prisma.user.findUnique({
+			where: { phoneNumber: phoneNumber },
+		});
+
+		if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+			throw new ConflictException('Invalid phone number or password');
+		}
+
+		const token = await this.generateTokens(user.id);
+		await this.updateRefreshToken(user.id, token.refreshToken);
+		return {
+			...token,
+			data: {
+				id: user.id,
+				fullName: user.fullName,
+				phoneNumber: user.phoneNumber,
+				email: user.email || 'No email found',
 				role: user.role,
 			},
 		};
