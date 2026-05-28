@@ -1,8 +1,9 @@
-//? JWT auth guard
+//*	 JWT auth guard
 
 import { AuthGuard } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
 import { ExecutionContext } from '@nestjs/common';
+import { IS_PUBLIC_KEY } from '../decorations/puclic.decorator';
 
 export class JwtAuthGuard extends AuthGuard('jwt') {
 	constructor(private reflector: Reflector) {
@@ -10,7 +11,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 	}
 
 	canActivate(context: ExecutionContext) {
-		const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
+		const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
 			context.getHandler(),
 			context.getClass(),
 		]);

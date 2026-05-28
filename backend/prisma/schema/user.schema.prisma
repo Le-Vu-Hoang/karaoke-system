@@ -19,5 +19,6 @@ model User {
   purchaseOrders PurchaseOrder[] @relation("StaffPurchaseOrders")
   shifts         Shift[]         @relation("StaffShifts")
 
+  @@index([phoneNumber])
   @@map("users")
 }
