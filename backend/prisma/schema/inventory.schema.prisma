@@ -24,9 +24,10 @@ model Service {
   stockQuantity Int     @default(0)
   isActive      Boolean @default(true)
 
-  category      ServiceCategory  @relation(fields: [categoryId], references: [id])
+  category      ServiceCategory     @relation(fields: [categoryId], references: [id])
   invoiceItems  InvoiceService[]
   inventoryLogs InventoryLog[]
+  purchaseItems PurchaseOrderItem[]
 
   @@map("services")
 }
@@ -51,7 +52,22 @@ model PurchaseOrder {
   supplier Supplier @relation(fields: [supplierId], references: [id])
   staff    User     @relation("StaffPurchaseOrders", fields: [staffId], references: [id])
 
+  items PurchaseOrderItem[]
+
   @@map("purchase_orders")
+}
+
+model PurchaseOrderItem {
+  id              String  @id @default(uuid(7)) @db.Uuid
+  purchaseOrderId String  @db.Uuid
+  serviceId       String  @db.Uuid
+  quantity        Int
+  unitPrice       Decimal @db.Decimal(10, 2)
+
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  service       Service       @relation(fields: [serviceId], references: [id])
+
+  @@map("purchase_order_items")
 }
 
 model InventoryLog {
