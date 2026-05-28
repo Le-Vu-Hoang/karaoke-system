@@ -2,7 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { builtin } from 'globals';
+import { PrismaClientExceptionFilter } from './common/filters/prisma-client-exception.filter';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -65,6 +66,13 @@ async function bootstrap() {
 			.swagger-ui .info .title {color: #4A90E2;}
 		`,
 	});
+
+	//# Use interceptor to transform response
+	app.useGlobalInterceptors(new TransformInterceptor());
+
+	//# Active catch prisma validation
+	app.useGlobalFilters(new PrismaClientExceptionFilter());
+
 	//# Port for server
 	await app.listen(process.env.PORT ?? 3001);
 }

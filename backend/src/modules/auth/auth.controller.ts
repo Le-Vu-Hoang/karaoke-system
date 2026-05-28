@@ -3,10 +3,10 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { RefreshTokenGuard } from '../../common/guards/refresh-token.guard';
-import { GetUser } from '../../common/decorations/get-user.decoration';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { LoginDto } from './dto/login.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { GetUser } from '../../common/decorations/get-user.decorator';
 
 @Controller('auth')
 @ApiTags('Auth')

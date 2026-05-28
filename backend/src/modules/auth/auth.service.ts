@@ -2,6 +2,7 @@ import {
 	ConflictException,
 	Injectable,
 	InternalServerErrorException,
+	Logger,
 	UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -12,6 +13,7 @@ import { randomBytes } from 'node:crypto';
 import { JwtService } from '@nestjs/jwt';
 import { Prisma } from '@prisma/client';
 import { LoginDto } from './dto/login.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +21,7 @@ export class AuthService {
 	constructor(
 		private prisma: PrismaService,
 		private jwtService: JwtService,
+		private configService: ConfigService,
 	) {}
 
 	//# Register service for new User
@@ -60,12 +63,11 @@ export class AuthService {
 		} catch (err) {
 			if (err instanceof Prisma.PrismaClientKnownRequestError) {
 				if (err.code === 'P2002') {
-					throw new ConflictException('Thông tin đăng ký đã tồn tại trong hệ thống');
+					throw new ConflictException('This phone is already in use');
 				}
 			}
-
-			console.error(err);
-			throw new InternalServerErrorException('Some thing went wrong');
+			Logger.error(err);
+			throw new InternalServerErrorException('An error occurred while registering the user');
 		}
 	}
 
@@ -77,7 +79,13 @@ export class AuthService {
 		const refreshId = randomBytes(16).toString('hex');
 		const [accessToken, refreshToken] = await Promise.all([
 			this.jwtService.signAsync(payload, { expiresIn: '30m' }),
-			this.jwtService.signAsync({ ...payload, refreshId }, { expiresIn: '7d' }),
+			this.jwtService.signAsync(
+				{ ...payload, refreshId },
+				{
+					secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
+					expiresIn: '7d',
+				},
+			),
 		]);
 
 		return { accessToken, refreshToken };
@@ -85,9 +93,10 @@ export class AuthService {
 
 	//# Update refresh token in database
 	async updateRefreshToken(userId: string, refreshToken: string): Promise<void> {
+		const hashRefreshToken = await bcrypt.hash(refreshToken, this.SALT_ROUNDS);
 		await this.prisma.user.update({
 			where: { id: userId },
-			data: { refreshToken: refreshToken },
+			data: { refreshToken: hashRefreshToken },
 		});
 	}
 
@@ -136,7 +145,7 @@ export class AuthService {
 		});
 
 		if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-			throw new ConflictException('Invalid phone number or password');
+			throw new UnauthorizedException('Invalid phone number or password');
 		}
 
 		const token = await this.generateTokens(user.id);
