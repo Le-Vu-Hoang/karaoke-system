@@ -4,14 +4,20 @@ enum EquipmentStatus {
   BROKEN
 }
 
+enum ShiftStatus {
+  OPEN
+  CLOSED
+}
+
 model Shift {
-  id           String    @id @default(uuid(7)) @db.Uuid
-  staffId      String    @db.Uuid
-  startTime    DateTime  @default(now())
+  id           String      @id @default(uuid(7)) @db.Uuid
+  staffId      String      @db.Uuid
+  startTime    DateTime    @default(now())
   endTime      DateTime?
-  startingCash Decimal   @db.Decimal(10, 2)
-  endingCash   Decimal?  @db.Decimal(10, 2)
-  expectedCash Decimal?  @db.Decimal(10, 2)
+  status       ShiftStatus @default(OPEN)
+  startingCash Decimal     @db.Decimal(10, 2)
+  endingCash   Decimal?    @db.Decimal(10, 2)
+  expectedCash Decimal?    @db.Decimal(10, 2)
 
   staff User @relation("StaffShifts", fields: [staffId], references: [id])
 

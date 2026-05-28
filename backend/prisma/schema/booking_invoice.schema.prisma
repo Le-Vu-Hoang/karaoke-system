@@ -29,6 +29,7 @@ model Booking {
   invoices Invoice[]
   payments Payment[]
 
+  @@index([bookingTime])
   @@map("bookings")
 }
 
@@ -51,6 +52,7 @@ model Invoice {
   invoiceItems InvoiceService[]
   payments     Payment[]
 
+  @@index([startTime, endTime])
   @@map("invoices")
 }
 

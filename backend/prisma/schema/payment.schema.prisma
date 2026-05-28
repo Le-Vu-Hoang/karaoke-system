@@ -25,6 +25,7 @@ model Voucher {
   validFrom        DateTime
   validUntil       DateTime
   usageLimit       Int?
+  usedCount        Int          @default(0)
 
   @@map("vouchers")
 }
