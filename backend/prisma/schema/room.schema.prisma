@@ -6,7 +6,7 @@ enum RoomStatus {
 
 model RoomType {
   id               String  @id @default(uuid(7)) @db.Uuid
-  name             String
+  name             String  @unique
   capacity         Int
   basePricePerHour Decimal @db.Decimal(10, 2)
   description      String? @db.Text
@@ -23,6 +23,7 @@ model Room {
   roomTypeId String     @db.Uuid
   roomNumber String     @unique
   status     RoomStatus @default(AVAILABLE)
+  isDeleted  Boolean    @default(false) @map("is_deleted")
 
   roomType   RoomType    @relation(fields: [roomTypeId], references: [id])
   bookings   Booking[]
