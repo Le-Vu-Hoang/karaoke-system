@@ -14,8 +14,8 @@ import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 		JwtModule.registerAsync({
 			inject: [ConfigService],
 			useFactory: (configService: ConfigService) => ({
-				secret: configService.get<string>('JWT_SECRET') ?? 'defaultsecret2026',
-				signOptions: { expiresIn: Number(configService.get<number>('JWT_EXPIRES_IN', 3600)) },
+				secret: configService.get<string>('JWT_SECRET_KEY') ?? 'defaultsecret2026',
+				signOptions: { expiresIn: Number(configService.get<string>('JWT_EXPIRES_IN') || '3600s') },
 			}),
 		}),
 		PrismaModule,
