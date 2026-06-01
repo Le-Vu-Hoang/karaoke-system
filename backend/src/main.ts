@@ -1,26 +1,14 @@
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { PrismaClientExceptionFilter } from './common/filters/prisma-client-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { PrismaClientExceptionFilter } from 'nestjs-prisma';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 
 	app.setGlobalPrefix('/api/v1');
-
-	//# Pipe validation for
-	app.useGlobalPipes(
-		new ValidationPipe({
-			whitelist: true,
-			forbidNonWhitelisted: true,
-			transform: true,
-			transformOptions: {
-				enableImplicitConversion: true,
-			},
-		}),
-	);
 
 	//# enable Cors
 	app.enableCors({
@@ -67,11 +55,29 @@ async function bootstrap() {
 		`,
 	});
 
+	//# Pipe validation for
+	app.useGlobalPipes(
+		new ValidationPipe({
+			whitelist: true,
+			forbidNonWhitelisted: true,
+			transform: true,
+			transformOptions: {
+				enableImplicitConversion: true,
+			},
+		}),
+	);
+
 	//# Use interceptor to transform response
-	app.useGlobalInterceptors(new TransformInterceptor());
+	app.useGlobalInterceptors(
+		new TransformInterceptor(),
+		new ClassSerializerInterceptor(app.get(Reflector), {
+			excludeExtraneousValues: true,
+		}),
+	);
 
 	//# Active catch prisma validation
-	app.useGlobalFilters(new PrismaClientExceptionFilter());
+	const { httpAdapter } = app.get(HttpAdapterHost);
+	app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
 
 	//# Port for server
 	await app.listen(process.env.PORT ?? 3001);
