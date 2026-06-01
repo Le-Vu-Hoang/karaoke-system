@@ -29,6 +29,7 @@ import { BookingDetailResponseDto, BookingSummaryResponseDto } from './dto/booki
 import { Roles } from '../../common/decorations/role.decorator';
 import { Role } from '@prisma/client';
 import { GetUser } from '../../common/decorations/get-user.decorator';
+import { CheckInResponseDto } from './dto/checkin-response.dto';
 
 @ApiTags('Bookings')
 @ApiBearerAuth('JWT')
@@ -47,7 +48,6 @@ export class BookingController {
 		status: 404,
 		description: 'Không tìm thấy loại phòng hoặc phòng được chọn không hợp lệ',
 	})
-	@Serialize(BookingSummaryResponseDto)
 	create(@Body() createBookingDto: CreateBookingDto) {
 		return this.bookingService.create(createBookingDto);
 	}
@@ -65,7 +65,6 @@ export class BookingController {
 		status: 404,
 		description: 'Không tìm thấy lịch hẹn nào. ',
 	})
-	@Serialize(BookingSummaryResponseDto)
 	findAll(@Query() query: BookingQueryDto) {
 		return this.bookingService.findAll(query);
 	}
@@ -91,9 +90,9 @@ export class BookingController {
 	@Patch(':id')
 	@Roles(Role.ADMIN, Role.STAFF)
 	@ApiOperation({ summary: 'Chỉnh sửa thông tin lịch đặt phòng (Giờ hát, Loại phòng...)' })
+	@ApiOkResponse({ type: BookingDetailResponseDto })
 	@ApiAuthErrors()
 	@ApiBadRequestResponse()
-	@Serialize(BookingSummaryResponseDto)
 	update(@Param('id') id: string, @Body() updateBookingDto: UpdateBookingDto) {
 		return this.bookingService.update(id, updateBookingDto);
 	}
@@ -104,20 +103,27 @@ export class BookingController {
 	@ApiOperation({
 		summary: 'Xác nhận khách đến (Check-in) -> Tự động đổi trạng thái phòng và tạo hóa đơn',
 	})
+	@ApiOkResponse({ type: CheckInResponseDto })
 	@ApiAuthErrors()
 	@ApiBadRequestResponse()
-	checkIn(@GetUser('id') userId: string, @Body() body: { roomId: string; bookingId: string }) {
-		const { roomId, bookingId } = body;
-		return this.bookingService.checkIn(bookingId, userId, roomId);
+	@Serialize(CheckInResponseDto)
+	checkIn(
+		@Param('id') bookingId: string,
+		@GetUser('id') staffId: string,
+		@Body('roomId') roomId: string,
+	) {
+		return this.bookingService.checkIn(bookingId, staffId, roomId);
 	}
 
 	//# Cancel booking
 	@Patch(':id/cancel')
 	@Roles(Role.ADMIN, Role.STAFF, Role.CUSTOMER)
 	@ApiOperation({ summary: 'Hủy đơn đặt lịch phòng' })
-	@ApiOkResponse({ description: 'Hủy đơn và giải phóng phòng thành công' })
+	@ApiOkResponse({
+		description: 'Hủy đơn và giải phóng phòng thành công',
+		type: BookingSummaryResponseDto,
+	})
 	@ApiBadRequestResponse({ description: 'Không thể hủy đơn do sai trạng thái' })
-	@Serialize(BookingSummaryResponseDto)
 	cancel(@Param('id') id: string) {
 		return this.bookingService.cancel(id);
 	}
