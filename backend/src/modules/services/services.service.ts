@@ -14,17 +14,13 @@ export class ServicesService {
 		});
 
 		if (!categoryExists) {
-			throw new NotFoundException('Danh mục không tồn tại!');
+			throw new NotFoundException('Category not found!');
 		}
-		const newService = await this.prisma.service.create({
+
+		return await this.prisma.service.create({
 			data: dto,
 			include: { category: true },
 		});
-
-		return {
-			...newService,
-			price: newService.price.toNumber(),
-		};
 	}
 
 	async getAllServices(query: PaginationQueryDto) {
@@ -46,13 +42,8 @@ export class ServicesService {
 		const effectiveLimit = limit || total || 1;
 		const lastPage = Math.ceil(total / effectiveLimit);
 
-		const mappedData = data.map((service) => ({
-			...service,
-			price: service.price.toNumber(),
-		}));
-
 		return {
-			data: mappedData,
+			data: data,
 			meta: {
 				total,
 				page,
@@ -71,40 +62,34 @@ export class ServicesService {
 			const categoryExists = await this.prisma.serviceCategory.findUnique({
 				where: { id: dto.categoryId },
 			});
-			if (!categoryExists) throw new NotFoundException('Danh mục không tồn tại!');
+			if (!categoryExists) throw new NotFoundException('Category not found!');
 		}
 
-		const updatedService = await this.prisma.service.update({
+		return await this.prisma.service.update({
 			where: { id },
 			data: dto,
 			include: { category: true },
 		});
-
-		return {
-			...updatedService,
-			price: updatedService.price.toNumber(),
-		};
 	}
 
-	async deleteService(id: string): Promise<string> {
+	async deleteService(id: string) {
 		await this.checkServiceExist(id);
 
-		// Dùng Soft Delete thay vì xóa vật lý để bảo toàn InventoryLog và InvoiceItem
 		await this.prisma.service.update({
 			where: { id },
 			data: { isActive: false },
 		});
 
-		return 'Vô hiệu hóa dịch vụ thành công!';
+		return { message: 'Service disabled successfully!' };
 	}
 
-	// --- Hàm Helper ---
+	//# --- Hàm Helper ---
 	private async checkServiceExist(id: string) {
 		const service = await this.prisma.service.findUnique({
 			where: { id },
 		});
 		if (!service || !service.isActive) {
-			throw new NotFoundException(`Không tìm thấy dịch vụ với ID: ${id}`);
+			throw new NotFoundException(`Service not found with ID: ${id}`);
 		}
 		return service;
 	}

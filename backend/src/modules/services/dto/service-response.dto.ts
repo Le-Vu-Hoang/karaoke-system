@@ -1,29 +1,66 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Expose, Type, Transform } from 'class-transformer';
 import { ServiceCategoryResponseDto } from './service-category-response.dto';
 
+/**
+ * Data Transfer Object cho dữ liệu phản hồi của một dịch vụ/món ăn.
+ */
 export class ServiceResponseDto {
-	@ApiProperty({ description: 'ID của dịch vụ/món ăn' })
+	/**
+	 * ID của dịch vụ/món ăn.
+	 *
+	 * @example 0190b9e8-fa12-7abc-9d8e-ef0123456789
+	 */
+	@Expose()
 	id: string;
 
-	@ApiProperty({ description: 'ID của danh mục chứa món này' })
+	/**
+	 * ID của danh mục chứa món này.
+	 *
+	 * @example 0190a1b2-c3d4-7ebd-8f9a-bcde12345678
+	 */
+	@Expose()
 	categoryId: string;
 
-	@ApiProperty({ description: 'Tên dịch vụ/món ăn (VD: Bia Tiger, Trái cây dĩa)' })
+	/**
+	 * Tên dịch vụ/món ăn.
+	 *
+	 * @example Bia Tiger
+	 */
+	@Expose()
 	name: string;
 
-	// 💡 LƯU Ý QUAN TRỌNG: Ở Database là Decimal, nhưng khi trả về API phải là number
-	@ApiProperty({ description: 'Giá bán', type: Number })
+	/**
+	 * Giá bán (VNĐ).
+	 * Tự động chuyển đổi kiểu Decimal của Prisma sang Number.
+	 *
+	 * @example 25000.0
+	 */
+	@Expose()
+	@Transform(({ value }) =>
+		value && typeof value.toNumber === 'function' ? value.toNumber() : Number(value) || 0,
+	)
 	price: number;
 
-	@ApiProperty({ description: 'Số lượng tồn kho hiện tại' })
+	/**
+	 * Số lượng tồn kho hiện tại.
+	 *
+	 * @example 100
+	 */
+	@Expose()
 	stockQuantity: number;
 
-	@ApiProperty({ description: 'Trạng thái hoạt động (true: Đang bán, false: Ngừng bán/Đã xóa)' })
+	/**
+	 * Trạng thái hoạt động (true: Đang bán, false: Ngừng bán/Đã xóa).
+	 *
+	 * @example true
+	 */
+	@Expose()
 	isActive: boolean;
 
-	@ApiPropertyOptional({
-		description: 'Thông tin chi tiết của danh mục (Có thể null nếu không include)',
-		type: () => ServiceCategoryResponseDto,
-	})
+	/**
+	 * Thông tin chi tiết của danh mục (Có thể null nếu không include).
+	 */
+	@Expose()
+	@Type(() => ServiceCategoryResponseDto)
 	category?: ServiceCategoryResponseDto;
 }

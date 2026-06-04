@@ -1,49 +1,62 @@
-//* DTO for auth responing
-
-import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
+import { Expose, Type } from 'class-transformer';
 
 class UserResponseData {
-	@ApiProperty({ example: 'clv123abc456', description: 'ID duy nhất của người dùng' })
+	/**
+	 * Unique identifier of the user
+	 * @example "clv123abc456"
+	 */
+	@Expose()
 	id: string;
 
-	@ApiProperty({ example: 'Nguyễn Văn A', description: 'Họ và tên đầy đủ' })
+	/**
+	 * Full name of the user
+	 * @example "Nguyen Van A"
+	 */
+	@Expose()
 	fullName: string;
 
-	@ApiProperty({ example: '0912345678', description: 'Số điện thoại liên lạc' })
+	/**
+	 * Contact phone number
+	 * @example "0912345678"
+	 */
+	@Expose()
 	phoneNumber: string;
 
-	@ApiProperty({
-		example: 'khachhang@gmail.com',
-		description: 'Địa chỉ email (nếu có)',
-		required: false,
-	})
+	/**
+	 * Email address (if available)
+	 * @example "customer@gmail.com"
+	 */
+	@Expose()
 	email?: string;
 
-	@ApiProperty({
-		enum: Role,
-		example: 'USER',
-		description: 'Vai trò của người dùng trong hệ thống',
-	})
+	/**
+	 * Role of the user in the system
+	 * @example "CUSTOMER"
+	 */
+	@Expose()
 	role: Role;
 }
 
 export class AuthResponseDto {
-	@ApiProperty({
-		description: 'Chuỗi Access Token dùng để truy cập các API bị chặn',
-		example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-	})
+	/**
+	 * Access Token string used to access protected APIs
+	 * @example "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+	 */
+	@Expose()
 	accessToken: string;
 
-	@ApiProperty({
-		description: 'Chuỗi Refresh Token dùng để lấy Access Token mới khi hết hạn',
-		example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-	})
+	/**
+	 * Refresh Token string used to get a new Access Token when expired
+	 * @example "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+	 */
+	@Expose()
 	refreshToken: string;
 
-	@ApiProperty({
-		type: UserResponseData,
-		description: 'Thông tin chi tiết của người dùng vừa đăng nhập/đăng ký',
-	})
+	/**
+	 * Detailed information of the logged in or registered user
+	 */
+	@Expose()
+	@Type(() => UserResponseData)
 	data: UserResponseData;
 }

@@ -1,32 +1,50 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Transform } from 'class-transformer';
 
+/**
+ * Data Transfer Object cho dữ liệu phản hồi của một loại phòng.
+ */
 export class RoomTypeResponseDto {
-	@ApiProperty({
-		example: '0190a1b2-c3d4-7ebd-8f9a-bcde12345678',
-		description: 'ID loại phòng (UUIDv7)',
-	})
+	/**
+	 * ID của loại phòng (UUIDv7).
+	 *
+	 * @example 0190a1b2-c3d4-7ebd-8f9a-bcde12345678
+	 */
 	@Expose()
 	id: string;
 
-	@ApiProperty({ example: 'Phòng VIP', description: 'Tên loại phòng' })
+	/**
+	 * Tên của loại phòng.
+	 *
+	 * @example Phòng VIP
+	 */
 	@Expose()
 	name: string;
 
-	@ApiProperty({ example: 10, description: 'Sức chứa tối đa' })
+	/**
+	 * Sức chứa tối đa của phòng.
+	 *
+	 * @example 10
+	 */
 	@Expose()
 	capacity: number;
 
-	@ApiProperty({ example: 150000.0, description: 'Giá cơ bản mỗi giờ (VNĐ)' })
+	/**
+	 * Giá cơ bản mỗi giờ của loại phòng này (VNĐ).
+	 * Tự động chuyển đổi kiểu Decimal của Prisma sang Number.
+	 *
+	 * @example 150000.0
+	 */
 	@Expose()
-	@Transform(({ value }) => (value ? Number(value) : 0))
+	@Transform(({ value }) =>
+		value && typeof value.toNumber === 'function' ? value.toNumber() : Number(value) || 0,
+	)
 	basePricePerHour: number;
 
-	@ApiProperty({
-		example: 'Phòng có hệ thống loa JBL hiện đại',
-		description: 'Mô tả chi tiết',
-		nullable: true,
-	})
+	/**
+	 * Mô tả chi tiết loại phòng.
+	 *
+	 * @example Phòng có hệ thống loa JBL hiện đại
+	 */
 	@Expose()
 	description: string | null;
 }

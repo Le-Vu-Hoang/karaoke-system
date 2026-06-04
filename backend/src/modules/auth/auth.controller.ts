@@ -5,11 +5,19 @@ import { AuthResponseDto } from './dto/auth-response.dto';
 import { RefreshTokenGuard } from '../../common/guards/refresh-token.guard';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { LoginDto } from './dto/login.dto';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+	ApiBadRequestResponse,
+	ApiBearerAuth,
+	ApiOperation,
+	ApiResponse,
+	ApiTags,
+} from '@nestjs/swagger';
 import { GetUser } from '../../common/decorations/get-user.decorator';
+import { Serialize } from '../../common/interceptors/serialize.interceptor';
 
 @Controller('auth')
 @ApiTags('Auth')
+@Serialize(AuthResponseDto)
 export class AuthController {
 	constructor(private readonly authService: AuthService) {}
 
@@ -18,7 +26,7 @@ export class AuthController {
 	@ApiOperation({ summary: 'Đăng nhập hệ thống' })
 	@ApiResponse({ status: 200, description: 'Đăng nhập thành công', type: AuthResponseDto })
 	@ApiResponse({ status: 401, description: 'Sai tài khoản hoặc mật khẩu' })
-	async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
+	async login(@Body() loginDto: LoginDto) {
 		return await this.authService.login(loginDto);
 	}
 	//# Register route
@@ -26,8 +34,8 @@ export class AuthController {
 	@HttpCode(HttpStatus.CREATED)
 	@ApiOperation({ summary: 'Đăng ký tài khoản mới' })
 	@ApiResponse({ status: 201, description: 'Tạo tài khoản thành công', type: AuthResponseDto })
-	@ApiResponse({ status: 409, description: 'Email đã tồn tại' })
-	async register(@Body() registerDto: RegisterDto): Promise<AuthResponseDto> {
+	@ApiResponse({ status: 409, description: 'Phone number đã tồn tại' })
+	async register(@Body() registerDto: RegisterDto) {
 		return await this.authService.register(registerDto);
 	}
 
@@ -35,10 +43,11 @@ export class AuthController {
 	@Post('refresh')
 	@HttpCode(HttpStatus.OK)
 	@UseGuards(RefreshTokenGuard)
-	@ApiBearerAuth()
+	@ApiBearerAuth('JWT')
 	@ApiOperation({ summary: 'Làm mới Access Token' })
 	@ApiResponse({ status: 200, type: AuthResponseDto })
-	async refreshToken(@GetUser('id') userId: string): Promise<AuthResponseDto> {
+	@ApiBadRequestResponse()
+	async refreshToken(@GetUser('id') userId: string) {
 		return await this.authService.refreshToken(userId);
 	}
 
@@ -46,7 +55,7 @@ export class AuthController {
 	@Post('logout')
 	@HttpCode(HttpStatus.OK)
 	@UseGuards(JwtAuthGuard)
-	@ApiBearerAuth()
+	@ApiBearerAuth('JWT')
 	@ApiOperation({ summary: 'Đăng xuất và hủy Token' })
 	@ApiResponse({ status: 200, description: 'Đăng xuất thành công' })
 	@ApiOperation({ summary: 'Logout' })

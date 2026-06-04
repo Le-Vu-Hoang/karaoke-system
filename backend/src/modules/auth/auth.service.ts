@@ -25,7 +25,7 @@ export class AuthService {
 	) {}
 
 	//# Register service for new User
-	async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
+	async register(registerDto: RegisterDto) {
 		const { fullname, phone, email, password } = registerDto;
 
 		const checkExistingUser = await this.prisma.user.findUnique({
@@ -130,6 +130,7 @@ export class AuthService {
 		};
 	}
 
+	//# Logout logic
 	async logout(userId: string): Promise<void> {
 		await this.prisma.user.update({
 			where: { id: userId },
@@ -137,6 +138,7 @@ export class AuthService {
 		});
 	}
 
+	//# Login logic
 	async login(loginDto: LoginDto): Promise<AuthResponseDto> {
 		const { phoneNumber, password } = loginDto;
 

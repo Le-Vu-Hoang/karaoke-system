@@ -1,29 +1,47 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString, IsDateString } from 'class-validator';
 import { BookingStatus } from '@prisma/client';
+import { Expose } from 'class-transformer';
 
+/**
+ * Data Transfer Object cho việc truy vấn danh sách đặt phòng.
+ */
 export class BookingQueryDto {
-	@ApiPropertyOptional({ description: 'Tìm kiếm theo tên hoặc SĐT khách' })
+	/**
+	 * Tìm kiếm theo tên hoặc SĐT khách.
+	 */
+	@Expose()
 	@IsOptional()
 	@IsString()
 	search?: string;
 
-	@ApiPropertyOptional({ enum: BookingStatus, description: 'Lọc theo trạng thái đặt phòng' })
+	/**
+	 * Lọc theo trạng thái đặt phòng.
+	 */
+	@Expose()
 	@IsOptional()
 	@IsEnum(BookingStatus)
 	status?: BookingStatus;
 
-	@ApiPropertyOptional({ description: 'Lọc từ ngày (YYYY-MM-DD)' })
+	/**
+	 * Lọc từ ngày (YYYY-MM-DD).
+	 */
+	@Expose()
 	@IsOptional()
 	@IsDateString()
 	fromDate?: string;
 
-	@ApiPropertyOptional({ description: 'Lọc đến ngày (YYYY-MM-DD)' })
+	/**
+	 * Lọc đến ngày (YYYY-MM-DD).
+	 */
+	@Expose()
 	@IsOptional()
 	@IsDateString()
 	toDate?: string;
 
-	@ApiPropertyOptional({ description: 'Lọc theo loại phòng' })
+	/**
+	 * Lọc theo loại phòng.
+	 */
+	@Expose()
 	@IsOptional()
 	@IsString()
 	roomTypeId?: string;

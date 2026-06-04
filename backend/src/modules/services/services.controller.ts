@@ -26,10 +26,9 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RoleGuard } from '../../common/guards/role.guard';
 import { Roles } from '../../common/decorations/role.decorator';
 import { PaginationQueryDto } from '../../common/dto/pagination.dto';
-import { Public } from '../../common/decorations/puclic.decorator';
 import { ServiceResponseDto } from './dto/service-response.dto';
-import { PaginatedResponseDto } from '../../common/dto/pagination-response.dto';
 import { ApiAuthErrors } from '../../common/decorations/api-auth-error.decorator';
+import { Serialize } from '../../common/interceptors/serialize.interceptor';
 
 @ApiTags('Services (Dịch vụ & Món ăn)')
 @ApiBearerAuth('JWT-auth')
@@ -38,41 +37,43 @@ import { ApiAuthErrors } from '../../common/decorations/api-auth-error.decorator
 export class ServicesController {
 	constructor(private readonly servicesService: ServicesService) {}
 
+	//# Create new service on system
 	@Post()
 	@Roles(Role.ADMIN, Role.STAFF)
 	@ApiOperation({ summary: 'Thêm mới dịch vụ/món ăn' })
 	@ApiCreatedResponse({ description: 'Tạo dịch vụ/món ăn thành công', type: ServiceResponseDto })
 	@ApiAuthErrors()
 	@ApiBadRequestResponse({ description: 'Dữ liệu gửi lên không hợp lệ (Validation Error)' })
-	async create(@Body() createServiceDto: CreateServiceDto): Promise<ServiceResponseDto> {
-		return await this.servicesService.createService(createServiceDto);
+	@Serialize(ServiceResponseDto)
+	create(@Body() createServiceDto: CreateServiceDto) {
+		return this.servicesService.createService(createServiceDto);
 	}
 
+	//# Get all services (menu)
 	@Get()
 	@Roles(Role.ADMIN, Role.STAFF, Role.CUSTOMER)
 	@ApiOperation({ summary: 'Lấy danh sách dịch vụ (Menu)' })
 	@ApiOkResponse({ description: 'Lấy danh sách thành công' })
 	@ApiAuthErrors()
 	@ApiBadRequestResponse({ description: 'Số trang không hợp lệ' })
-	async findAll(
-		@Query() query: PaginationQueryDto,
-	): Promise<PaginatedResponseDto<ServiceResponseDto>> {
-		return await this.servicesService.getAllServices(query);
+	@Serialize(ServiceResponseDto)
+	findAll(@Query() query: PaginationQueryDto) {
+		return this.servicesService.getAllServices(query);
 	}
 
+	//# Update service info
 	@Patch(':id')
 	@Roles(Role.ADMIN)
 	@ApiOperation({ summary: 'Cập nhật thông tin dịch vụ' })
 	@ApiOkResponse({ description: 'Cập nhật thành công', type: ServiceResponseDto })
 	@ApiAuthErrors()
 	@ApiBadRequestResponse({ description: 'Dữ liệu gửi lên không hợp lệ hoặc ID sai định dạng' })
-	async update(
-		@Param('id') id: string,
-		@Body() updateServiceDto: UpdateServiceDto,
-	): Promise<ServiceResponseDto> {
-		return await this.servicesService.updateService(id, updateServiceDto);
+	@Serialize(ServiceResponseDto)
+	update(@Param('id') id: string, @Body() updateServiceDto: UpdateServiceDto) {
+		return this.servicesService.updateService(id, updateServiceDto);
 	}
 
+	//# Delete service (Soft delete - Vô hiệu hóa)
 	@Delete(':id')
 	@Roles(Role.ADMIN)
 	@ApiOperation({ summary: 'Vô hiệu hóa (Xóa mềm) dịch vụ' })
@@ -82,8 +83,7 @@ export class ServicesController {
 	})
 	@ApiAuthErrors()
 	@ApiBadRequestResponse({ description: 'ID sai định dạng' })
-	async remove(@Param('id') id: string): Promise<{ message: string }> {
-		const message = await this.servicesService.deleteService(id);
-		return { message };
+	remove(@Param('id') id: string) {
+		return this.servicesService.deleteService(id);
 	}
 }

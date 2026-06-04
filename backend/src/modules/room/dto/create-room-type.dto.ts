@@ -1,23 +1,46 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsInt, IsNumber, IsOptional, Min } from 'class-validator';
+import { Expose } from 'class-transformer';
 
+/**
+ * Data Transfer Object cho việc tạo mới loại phòng.
+ */
 export class CreateRoomTypeDto {
-	@ApiProperty({ example: 'Phòng VIP', description: 'Tên loại phòng' })
+	/**
+	 * Tên loại phòng (VD: Phòng VIP, Phòng Standard).
+	 *
+	 * @example Phòng VIP
+	 */
+	@Expose()
 	@IsString()
 	@IsNotEmpty({ message: 'Tên loại phòng không được để trống' })
 	name: string;
 
-	@ApiProperty({ example: 10, description: 'Sức chứa tối đa của phòng' })
+	/**
+	 * Sức chứa tối đa của phòng.
+	 *
+	 * @example 10
+	 */
+	@Expose()
 	@IsInt()
 	@Min(1, { message: 'Sức chứa phải lớn hơn 0' })
 	capacity: number;
 
-	@ApiProperty({ example: 150000, description: 'Giá cơ bản mỗi giờ (VNĐ)' })
+	/**
+	 * Giá thuê cơ bản mỗi giờ của loại phòng này (VNĐ).
+	 *
+	 * @example 150000
+	 */
+	@Expose()
 	@IsNumber({}, { message: 'Giá tiền phải là một số' })
 	@Min(0, { message: 'Giá tiền không được âm' })
 	basePricePerHour: number;
 
-	@ApiPropertyOptional({ example: 'Phòng có view ban công, dàn âm thanh cao cấp' })
+	/**
+	 * Mô tả chi tiết về loại phòng (không bắt buộc).
+	 *
+	 * @example Phòng có view ban công, dàn âm thanh cao cấp
+	 */
+	@Expose()
 	@IsString()
 	@IsOptional()
 	description?: string;

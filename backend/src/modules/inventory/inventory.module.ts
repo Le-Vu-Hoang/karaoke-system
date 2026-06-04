@@ -3,7 +3,7 @@ import { InventoryController } from './inventory.controller';
 import { InventoryService } from './inventory.service';
 
 @Module({
-  controllers: [InventoryController],
-  providers: [InventoryService]
+	controllers: [InventoryController],
+	providers: [InventoryService],
 })
 export class InventoryModule {}

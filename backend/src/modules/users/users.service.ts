@@ -1,17 +1,23 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UserResponseDto } from './dto/user-response.dto';
 import { PaginationQueryDto } from '../../common/dto/pagination.dto';
 import { PaginatedResponseDto } from '../../common/dto/pagination-response.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { UpdateUserInfoDto } from './dto/update-info.dto';
+import {
+	BadRequestException,
+	ConflictException,
+	Injectable,
+	NotFoundException,
+} from '@nestjs/common';
 
 @Injectable()
 export class UsersService {
 	constructor(private readonly prisma: PrismaService) {}
 
-	async findOne(id: string): Promise<UserResponseDto> {
+	//# Find user with id
+	async findOne(id: string) {
 		const user = await this.prisma.user.findUnique({
 			where: { id },
 			select: {
@@ -31,6 +37,7 @@ export class UsersService {
 		return user;
 	}
 
+	//# Find many users with pagination
 	async findAll(query: PaginationQueryDto): Promise<PaginatedResponseDto<UserResponseDto>> {
 		const page = query.page ?? 1;
 		const limit = query.limit ?? 10;
@@ -54,10 +61,10 @@ export class UsersService {
 			this.prisma.user.count(),
 		]);
 
-		const lastPage = Math.ceil(total / page);
+		const lastPage = Math.ceil(total / limit);
 
 		return {
-			data: data,
+			data: data as UserResponseDto[],
 			meta: {
 				total,
 				page,
@@ -69,6 +76,7 @@ export class UsersService {
 		};
 	}
 
+	//# Update profile user
 	async updateCurrentUser(userId: string, body: UpdateUserInfoDto): Promise<UserResponseDto> {
 		const { fullName, phoneNumber, email } = body;
 
@@ -77,7 +85,7 @@ export class UsersService {
 		});
 
 		if (!currentUser) {
-			throw new NotFoundException('Không tìm thấy người dùng');
+			throw new NotFoundException('User not found');
 		}
 
 		if (phoneNumber && phoneNumber !== currentUser.phoneNumber) {
@@ -86,7 +94,7 @@ export class UsersService {
 			});
 
 			if (existingPhone) {
-				throw new ConflictException('Số điện thoại này đã được đăng ký bởi một tài khoản khác.');
+				throw new ConflictException('This phone number is already registered by another account.');
 			}
 		}
 
@@ -96,11 +104,11 @@ export class UsersService {
 			});
 
 			if (existingEmail) {
-				throw new ConflictException('Email này đã được đăng ký bởi một tài khoản khác.');
+				throw new ConflictException('This email is already registered by another account.');
 			}
 		}
 
-		return await this.prisma.user.update({
+		return this.prisma.user.update({
 			where: { id: userId },
 			data: {
 				...(fullName && { fullName: fullName }),
@@ -115,11 +123,17 @@ export class UsersService {
 				role: true,
 				createdAt: true,
 			},
-		});
+		}) as unknown as UserResponseDto;
 	}
 
+	//# Change password
 	async changePassword(userId: string, body: ChangePasswordDto): Promise<string> {
-		const { oldPassword, newPassword } = body;
+		const { oldPassword, newPassword, confirmPassword } = body;
+
+		if (newPassword !== confirmPassword) {
+			throw new BadRequestException('New password and confirm password do not match');
+		}
+
 		const user = await this.prisma.user.findUnique({
 			where: { id: userId },
 			select: {
@@ -128,7 +142,7 @@ export class UsersService {
 		});
 
 		if (!user) {
-			throw new ConflictException('Old password is incorrect');
+			throw new NotFoundException('User not found');
 		}
 
 		const isMatch = await bcrypt.compare(oldPassword, user.passwordHash);
@@ -145,6 +159,6 @@ export class UsersService {
 			},
 		});
 
-		return 'Change password successfully';
+		return 'Password changed successfully';
 	}
 }

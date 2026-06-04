@@ -1,43 +1,45 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
+import { Expose } from 'class-transformer';
 
 export class UserResponseDto {
-	@ApiProperty({
-		example: '018f3b2a-7b3b-7d3a-8f3b-2a7b3b7d3a8f',
-		description: 'Mã định danh duy nhất của người dùng (định dạng UUID v7)',
-	})
+	/**
+	 * Unique identifier of the user (UUID v7 format)
+	 * @example "018f3b2a-7b3b-7d3a-8f3b-2a7b3b7d3a8f"
+	 */
+	@Expose()
 	id: string;
 
-	@ApiProperty({
-		example: 'Nguyễn Văn A',
-		description: 'Họ và tên đầy đủ của người dùng',
-	})
+	/**
+	 * Full name of the user
+	 * @example "Nguyen Van A"
+	 */
+	@Expose()
 	fullName: string;
 
-	@ApiProperty({
-		example: '0901234567',
-		description: 'Số điện thoại liên lạc chính thức (dùng để đặt phòng)',
-	})
+	/**
+	 * Official contact phone number (used for booking)
+	 * @example "0901234567"
+	 */
+	@Expose()
 	phoneNumber: string;
 
-	@ApiProperty({
-		example: 'user@gmail.com',
-		required: false,
-		description: 'Địa chỉ email của người dùng (có thể để trống)',
-	})
+	/**
+	 * Email address of the user (can be empty)
+	 * @example "user@gmail.com"
+	 */
+	@Expose()
 	email: string | null;
 
-	@ApiProperty({
-		enum: Role,
-		example: Role.CUSTOMER,
-		description:
-			'Vai trò của người dùng trong hệ thống: CUSTOMER (Khách), STAFF (Nhân viên), ADMIN (Quản trị)',
-	})
+	/**
+	 * Role of the user in the system: CUSTOMER, STAFF, ADMIN
+	 * @example "CUSTOMER"
+	 */
+	@Expose()
 	role: Role;
 
-	@ApiProperty({
-		example: '2026-05-16T10:00:00.000Z',
-		description: 'Thời điểm tài khoản được đăng ký trên hệ thống',
-	})
+	/**
+	 * The time the account was registered on the system
+	 */
+	@Expose()
 	createdAt: Date;
 }

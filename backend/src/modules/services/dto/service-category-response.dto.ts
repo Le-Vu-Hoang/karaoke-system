@@ -1,18 +1,46 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 
+/**
+ * Data Transfer Object cho thông tin danh mục dịch vụ.
+ */
 export class ServiceCategoryResponseDto {
-	@ApiProperty({ description: 'ID của danh mục' })
+	/**
+	 * ID của danh mục.
+	 *
+	 * @example 0190a1b2-c3d4-7ebd-8f9a-bcde12345678
+	 */
+	@Expose()
 	id: string;
 
-	@ApiProperty({ description: 'Tên danh mục (VD: Đồ uống, Đồ ăn vặt)' })
+	/**
+	 * Tên danh mục (VD: Đồ uống, Đồ ăn vặt).
+	 *
+	 * @example Đồ uống
+	 */
+	@Expose()
 	name: string;
 
-	@ApiPropertyOptional({ description: 'Mô tả chi tiết danh mục' })
+	/**
+	 * Mô tả chi tiết danh mục.
+	 *
+	 * @example Các loại bia và nước ngọt
+	 */
+	@Expose()
 	description?: string | null;
 
-	@ApiProperty({ description: 'Thứ tự hiển thị trên Menu' })
+	/**
+	 * Thứ tự hiển thị trên Menu.
+	 *
+	 * @example 1
+	 */
+	@Expose()
 	displayOrder: number;
 
-	@ApiProperty({ description: 'Trạng thái hoạt động' })
+	/**
+	 * Trạng thái hoạt động.
+	 *
+	 * @example true
+	 */
+	@Expose()
 	isActive: boolean;
 }

@@ -10,6 +10,7 @@ import {
 	UseGuards,
 } from '@nestjs/common';
 import {
+	ApiBadRequestResponse,
 	ApiBearerAuth,
 	ApiCreatedResponse,
 	ApiOkResponse,
@@ -35,6 +36,7 @@ import { CreateRoomDto } from './dto/create-room.dto';
 import { RoomResponseDto } from './dto/room-response.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { UpdateRoomStatusDto } from './dto/update-room-status.dto';
+import { Serialize } from '../../common/interceptors/serialize.interceptor';
 
 @ApiTags('Rooms')
 @ApiBearerAuth('JWT')
@@ -52,8 +54,10 @@ export class RoomController {
 		type: RoomTypeResponseDto,
 	})
 	@ApiAuthErrors()
-	async createNewRoomtype(@Body() body: CreateRoomTypeDto): Promise<RoomTypeResponseDto> {
-		return await this.roomService.createNewType(body);
+	@ApiBadRequestResponse({ description: 'Dữ liệu không hợp lệ' })
+	@Serialize(RoomTypeResponseDto)
+	createNewRoomtype(@Body() body: CreateRoomTypeDto) {
+		return this.roomService.createNewType(body);
 	}
 
 	//# Get all type of rooms
@@ -62,10 +66,10 @@ export class RoomController {
 	@ApiOperation({ summary: 'Lấy danh sách tất cả loại phòng' })
 	@ApiPaginatedResponse(RoomTypeResponseDto)
 	@ApiAuthErrors()
-	async getAllRoomType(
-		@Query() query: PaginationQueryDto,
-	): Promise<PaginatedResponseDto<RoomTypeResponseDto>> {
-		return await this.roomService.getAllRoomTypes(query);
+	@ApiBadRequestResponse({ description: 'Dữ liệu truy vấn không hợp lệ' })
+	@Serialize(RoomTypeResponseDto)
+	getAllRoomType(@Query() query: PaginationQueryDto) {
+		return this.roomService.getAllRoomTypes(query);
 	}
 
 	//# Update room type info
@@ -75,11 +79,10 @@ export class RoomController {
 	@ApiParam({ name: 'id', description: 'ID của loại phòng (UUID)', type: String })
 	@ApiOkResponse({ description: 'Cập nhật thành công', type: RoomTypeResponseDto })
 	@ApiAuthErrors()
-	async updateRoomTypeInfo(
-		@Param('id') id: string,
-		@Body() body: UpdateRoomTypeDto,
-	): Promise<RoomTypeResponseDto> {
-		return await this.roomService.updateRoomTypeInfo(body, id);
+	@ApiBadRequestResponse({ description: 'Dữ liệu không hợp lệ' })
+	@Serialize(RoomTypeResponseDto)
+	updateRoomTypeInfo(@Param('id') id: string, @Body() body: UpdateRoomTypeDto) {
+		return this.roomService.updateRoomTypeInfo(body, id);
 	}
 
 	//# Add new room
@@ -88,8 +91,10 @@ export class RoomController {
 	@ApiOperation({ summary: 'Thêm phòng vật lý mới' })
 	@ApiCreatedResponse({ description: 'Thêm phòng thành công', type: String })
 	@ApiAuthErrors()
-	async addNewRoom(@Body() body: CreateRoomDto): Promise<RoomResponseDto> {
-		return await this.roomService.addNewRoom(body);
+	@ApiBadRequestResponse({ description: 'Dữ liệu không hợp lệ' })
+	@Serialize(RoomResponseDto)
+	addNewRoom(@Body() body: CreateRoomDto) {
+		return this.roomService.addNewRoom(body);
 	}
 
 	//# Get all rooms
@@ -98,10 +103,10 @@ export class RoomController {
 	@ApiOperation({ summary: 'Lấy danh sách các phòng' })
 	@ApiPaginatedResponse(RoomResponseDto)
 	@ApiAuthErrors()
-	async getAllRooms(
-		@Query() query: PaginationQueryDto,
-	): Promise<PaginatedResponseDto<RoomResponseDto>> {
-		return await this.roomService.getAllRooms(query);
+	@ApiBadRequestResponse()
+	@Serialize(RoomResponseDto)
+	getAllRooms(@Query() query: PaginationQueryDto): Promise<PaginatedResponseDto<RoomResponseDto>> {
+		return this.roomService.getAllRooms(query);
 	}
 
 	//# Get room info
@@ -112,8 +117,9 @@ export class RoomController {
 	@ApiOkResponse({ description: 'Dữ liệu chi tiết phòng', type: RoomResponseDto })
 	@ApiResponse({ status: 404, description: 'Không tìm thấy phòng' })
 	@ApiAuthErrors()
-	async getRoomInfo(@Param('id') id: string): Promise<RoomResponseDto> {
-		return await this.roomService.getRoomInfo(id);
+	@Serialize(RoomResponseDto)
+	getRoomInfo(@Param('id') id: string) {
+		return this.roomService.getRoomInfo(id);
 	}
 
 	//# Update room info
@@ -123,11 +129,10 @@ export class RoomController {
 	@ApiParam({ name: 'id', description: 'ID của phòng (UUID)', type: String })
 	@ApiOkResponse({ description: 'Cập nhật thành công', type: String })
 	@ApiAuthErrors()
-	async updateRoomInfo(
-		@Param('id') id: string,
-		@Body() body: UpdateRoomDto,
-	): Promise<RoomResponseDto> {
-		return await this.roomService.updateRoomInfo(body, id);
+	@ApiBadRequestResponse()
+	@Serialize(RoomResponseDto)
+	updateRoomInfo(@Param('id') id: string, @Body() body: UpdateRoomDto) {
+		return this.roomService.updateRoomInfo(body, id);
 	}
 
 	//# Update status room
@@ -137,11 +142,9 @@ export class RoomController {
 	@ApiParam({ name: 'id', description: 'ID của phòng (UUID)', type: String })
 	@ApiOkResponse({ description: 'Chuyển trạng thái thành công', type: String })
 	@ApiAuthErrors()
-	async updateRoomStatus(
-		@Param('id') id: string,
-		@Body() body: UpdateRoomStatusDto,
-	): Promise<string> {
-		return await this.roomService.updateRoomStatus(id, body.status);
+	@ApiBadRequestResponse()
+	updateRoomStatus(@Param('id') id: string, @Body() body: UpdateRoomStatusDto) {
+		return this.roomService.updateRoomStatus(id, body.status);
 	}
 
 	//# Disable room
@@ -151,7 +154,8 @@ export class RoomController {
 	@ApiParam({ name: 'id', description: 'ID của phòng (UUID)', type: String })
 	@ApiOkResponse({ description: 'Vô hiệu hóa thành công', type: String })
 	@ApiAuthErrors()
-	async disableRoom(@Param('id') id: string): Promise<string> {
-		return await this.roomService.disableRoom(id);
+	@ApiBadRequestResponse()
+	disableRoom(@Param('id') id: string) {
+		return this.roomService.disableRoom(id);
 	}
 }
