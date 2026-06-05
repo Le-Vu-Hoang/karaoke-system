@@ -9,21 +9,21 @@ import { UsersModule } from './modules/users/users.module';
 import { RoomModule } from './modules/room/room.module';
 import { ShiftModule } from './modules/shift/shift.module';
 import { ServicesModule } from './modules/services/services.module';
-import { PaymentModule } from './modules/payment/payment.module';
-import { InvoiceModule } from './modules/invoice/invoice.module';
-import { InventoryModule } from './modules/inventory/inventory.module';
-import { EquipmentsModule } from './modules/equipments/equipments.module';
 import { BookingModule } from './modules/booking/booking.module';
-import { PricingModule } from './modules/pricing/pricing.module';
 import { BookingController } from './modules/booking/booking.controller';
 import { ServicesController } from './modules/services/services.controller';
 import { InvoiceController } from './modules/invoice/invoice.controller';
 import { PaymentController } from './modules/payment/payment.controller';
 import { InventoryController } from './modules/inventory/inventory.controller';
 import { ShiftController } from './modules/shift/shift.controller';
-import { EquipmentsController } from './modules/equipments/equipments.controller';
 import { PricingController } from './modules/pricing/pricing.controller';
 import Joi from 'joi';
+import { EquipmentController } from './modules/equipment/equipment.controller';
+import { PricingModule } from './modules/pricing/pricing.module';
+import { EquipmentModule } from './modules/equipment/equipment.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
+import { InvoiceModule } from './modules/invoice/invoice.module';
+import { PaymentModule } from './modules/payment/payment.module';
 
 @Module({
 	imports: [
@@ -42,7 +42,7 @@ import Joi from 'joi';
 		RoomModule,
 		PricingModule,
 		BookingModule,
-		EquipmentsModule,
+		EquipmentModule,
 		InventoryModule,
 		InvoiceModule,
 		PaymentModule,
@@ -58,7 +58,7 @@ import Joi from 'joi';
 		PaymentController,
 		InventoryController,
 		ShiftController,
-		EquipmentsController,
+		EquipmentController,
 	],
 	providers: [AppService, JwtStrategy],
 })
