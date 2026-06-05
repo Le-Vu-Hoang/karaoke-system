@@ -45,6 +45,9 @@ model Invoice {
   discount      Decimal       @default(0) @db.Decimal(10, 2)
   finalTotal    Decimal       @default(0) @db.Decimal(10, 2)
   status        InvoiceStatus @default(UNPAID)
+  isDeleted     Boolean       @default(false) @map("is_deleted")
+  reason        String?
+  createdAt     DateTime      @default(now())
 
   booking      Booking?         @relation(fields: [bookingId], references: [id])
   room         Room             @relation(fields: [roomId], references: [id])
