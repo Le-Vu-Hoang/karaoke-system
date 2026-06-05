@@ -9,7 +9,7 @@ import { ApiAuthErrors } from '../../common/decorations/api-auth-error.decorator
 @ApiTags('Invoice')
 @Controller('invoice')
 export class InvoiceController {
-	constructor(private readonly invoiceService: InvoiceService) {}
+	constructor(private readonly invoiceService: InvoiceService) { }
 
 	@Post()
 	@HttpCode(HttpStatus.CREATED)
