@@ -14,7 +14,7 @@ import { BookingController } from './modules/booking/booking.controller';
 import { ServicesController } from './modules/services/services.controller';
 import { InvoiceController } from './modules/invoice/invoice.controller';
 import { PaymentController } from './modules/payment/payment.controller';
-import { InventoryController } from './modules/inventory/inventory.controller';
+
 import { ShiftController } from './modules/shift/shift.controller';
 import { PricingController } from './modules/pricing/pricing.controller';
 import Joi from 'joi';
@@ -56,10 +56,9 @@ import { PaymentModule } from './modules/payment/payment.module';
 		ServicesController,
 		InvoiceController,
 		PaymentController,
-		InventoryController,
 		ShiftController,
 		EquipmentController,
 	],
 	providers: [AppService, JwtStrategy],
 })
-export class AppModule {}
+export class AppModule { }
