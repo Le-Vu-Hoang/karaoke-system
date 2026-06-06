@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './modules/auth/strategies/jwt.strategy';
 import { UsersModule } from './modules/users/users.module';
 import { RoomModule } from './modules/room/room.module';
@@ -24,6 +24,7 @@ import { EquipmentModule } from './modules/equipment/equipment.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { PaymentModule } from './modules/payment/payment.module';
+import { RedisModule } from './modules/redis/redis.module';
 
 @Module({
 	imports: [
@@ -34,6 +35,15 @@ import { PaymentModule } from './modules/payment/payment.module';
 				PORT: Joi.number().default(3001),
 				DATABASE_URL: Joi.string().required(),
 				JWT_SECRET: Joi.string().required(),
+			}),
+		}),
+		RedisModule.forRootAsync({
+			imports: [ConfigModule],
+			inject: [ConfigService],
+			useFactory: (configService: ConfigService) => ({
+				host: configService.get<string>('REDIS_HOST', 'localhost'),
+				port: configService.get<number>('REDIS_PORT', 6379),
+				ttl: 300000,
 			}),
 		}),
 		AuthModule,
@@ -48,6 +58,7 @@ import { PaymentModule } from './modules/payment/payment.module';
 		PaymentModule,
 		ServicesModule,
 		ShiftModule,
+		RedisModule,
 	],
 	controllers: [
 		AppController,
@@ -61,4 +72,4 @@ import { PaymentModule } from './modules/payment/payment.module';
 	],
 	providers: [AppService, JwtStrategy],
 })
-export class AppModule { }
+export class AppModule {}
