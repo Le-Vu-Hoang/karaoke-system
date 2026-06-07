@@ -5,9 +5,16 @@ import { BookingQueryDto } from './dto/booking-query.dto';
 import { BookingStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
+import { PricingService } from '../pricing/pricing.service';
+import { PaymentService } from '../payment/payment.service';
+
 @Injectable()
 export class BookingService {
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(
+		private readonly prisma: PrismaService,
+		private readonly pricingService: PricingService,
+		private readonly paymentService: PaymentService,
+	) {}
 
 	//# Create new booking for user
 	async create(createBookingDto: CreateBookingDto) {
@@ -27,6 +34,21 @@ export class BookingService {
 			}
 		}
 
+		// Tính tiền cọc = Giá 1 giờ của phòng
+		const startTime = new Date(createBookingDto.bookingTime);
+		const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 giờ sau
+		
+		const priceResult = await this.pricingService.calculatePrice({
+			roomTypeId: createBookingDto.roomTypeId,
+			startTime: startTime.toISOString(),
+			endTime: endTime.toISOString()
+		});
+		
+		const minDeposit = priceResult.totalPrice;
+		const finalDeposit = createBookingDto.deposit && createBookingDto.deposit > minDeposit 
+			? createBookingDto.deposit 
+			: minDeposit;
+
 		return this.prisma.booking.create({
 			data: {
 				customerId: createBookingDto.customerId || null,
@@ -34,13 +56,30 @@ export class BookingService {
 				guestPhone: createBookingDto.guestPhone || null,
 				roomTypeId: createBookingDto.roomTypeId,
 				roomId: createBookingDto.roomId || null,
-				bookingTime: new Date(createBookingDto.bookingTime),
+				bookingTime: startTime,
 				durationExpected: createBookingDto.durationExpected,
-				deposit: createBookingDto.deposit || 0,
+				deposit: finalDeposit,
 				status: BookingStatus.PENDING,
 			},
 			include: { roomType: true, room: true },
 		});
+	}
+
+	//# Create Payment Intent for Deposit
+	async payDeposit(id: string) {
+		const booking = await this.findOne(id);
+		if (booking.status !== BookingStatus.PENDING) {
+			throw new BadRequestException('Booking is not pending, cannot pay deposit.');
+		}
+		if (!booking.deposit || booking.deposit.toNumber() <= 0) {
+			throw new BadRequestException('No deposit required for this booking.');
+		}
+
+		// Tạo Stripe intent
+		return this.paymentService.createTransaction(
+			booking.deposit.toNumber(),
+			{ bookingId: booking.id }
+		);
 	}
 
 	//# Find all booking query

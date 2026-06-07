@@ -48,13 +48,12 @@ export class RedisService {
 	//# Lấy dữ liệu từ cache hoặc fetch nếu không tồn tại
 	async getOrSet<T>(key: string, fetcher: () => Promise<T>, ttl?: number): Promise<T> {
 		const cached = await this.get<T>(key);
-		if (cached) {
+		if (cached !== null && cached !== undefined) {
 			return cached;
 		}
 
-		// Fallback to fetcher if cache is missing or Redis is down
 		const data = await fetcher();
-		if (data) {
+		if (data !== null && data !== undefined) {
 			await this.set(key, data, ttl);
 		}
 		return data;

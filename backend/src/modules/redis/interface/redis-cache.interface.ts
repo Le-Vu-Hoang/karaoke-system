@@ -1,4 +1,4 @@
-import { ModuleMetadata, Type } from '@nestjs/common';
+import { ModuleMetadata } from '@nestjs/common';
 
 export interface RedisCacheOptions {
 	host: string;
