@@ -115,6 +115,17 @@ export class BookingController {
 		return this.bookingService.checkIn(bookingId, staffId, roomId);
 	}
 
+	//# Pay deposit for booking
+	@Post(':id/pay-deposit')
+	@Roles(Role.CUSTOMER, Role.ADMIN, Role.STAFF)
+	@ApiOperation({ summary: 'Thanh toán tiền cọc cho đơn đặt phòng qua Stripe' })
+	@ApiOkResponse({ description: 'Trả về clientSecret để Frontend quẹt thẻ' })
+	@ApiAuthErrors()
+	@ApiBadRequestResponse({ description: 'Đơn không ở trạng thái PENDING hoặc không cần cọc' })
+	payDeposit(@Param('id') id: string) {
+		return this.bookingService.payDeposit(id);
+	}
+
 	//# Cancel booking
 	@Patch(':id/cancel')
 	@Roles(Role.ADMIN, Role.STAFF, Role.CUSTOMER)

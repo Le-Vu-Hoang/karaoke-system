@@ -6,7 +6,7 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
 import { PrismaClientExceptionFilter } from 'nestjs-prisma';
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule);
+	const app = await NestFactory.create(AppModule, { rawBody: true });
 
 	app.setGlobalPrefix('/api/v1');
 
