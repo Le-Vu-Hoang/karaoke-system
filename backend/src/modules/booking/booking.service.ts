@@ -37,17 +37,18 @@ export class BookingService {
 		// Tính tiền cọc = Giá 1 giờ của phòng
 		const startTime = new Date(createBookingDto.bookingTime);
 		const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 giờ sau
-		
+
 		const priceResult = await this.pricingService.calculatePrice({
 			roomTypeId: createBookingDto.roomTypeId,
-			startTime: startTime.toISOString(),
-			endTime: endTime.toISOString()
+			startTime: startTime,
+			endTime: endTime,
 		});
-		
+
 		const minDeposit = priceResult.totalPrice;
-		const finalDeposit = createBookingDto.deposit && createBookingDto.deposit > minDeposit 
-			? createBookingDto.deposit 
-			: minDeposit;
+		const finalDeposit =
+			createBookingDto.deposit && createBookingDto.deposit > minDeposit
+				? createBookingDto.deposit
+				: minDeposit;
 
 		return this.prisma.booking.create({
 			data: {
@@ -76,10 +77,9 @@ export class BookingService {
 		}
 
 		// Tạo Stripe intent
-		return this.paymentService.createTransaction(
-			booking.deposit.toNumber(),
-			{ bookingId: booking.id }
-		);
+		return this.paymentService.createTransaction(booking.deposit.toNumber(), {
+			bookingId: booking.id,
+		});
 	}
 
 	//# Find all booking query

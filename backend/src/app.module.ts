@@ -10,15 +10,7 @@ import { RoomModule } from './modules/room/room.module';
 import { ShiftModule } from './modules/shift/shift.module';
 import { ServicesModule } from './modules/services/services.module';
 import { BookingModule } from './modules/booking/booking.module';
-import { BookingController } from './modules/booking/booking.controller';
-import { ServicesController } from './modules/services/services.controller';
-import { InvoiceController } from './modules/invoice/invoice.controller';
-import { PaymentController } from './modules/payment/payment.controller';
-
-import { ShiftController } from './modules/shift/shift.controller';
-import { PricingController } from './modules/pricing/pricing.controller';
 import Joi from 'joi';
-import { EquipmentController } from './modules/equipment/equipment.controller';
 import { PricingModule } from './modules/pricing/pricing.module';
 import { EquipmentModule } from './modules/equipment/equipment.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
@@ -35,7 +27,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 			validationSchema: Joi.object({
 				PORT: Joi.number().default(3001),
 				DATABASE_URL: Joi.string().required(),
-				JWT_SECRET: Joi.string().required(),
+				JWT_SECRET_KEY: Joi.string().required(),
 				STRIPE_SECRET_KEY: Joi.string().required(),
 				STRIPE_WEBHOOK_SECRET: Joi.string().required(),
 				REDIS_HOST: Joi.string().default('localhost'),
@@ -76,16 +68,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 		ShiftModule,
 		RedisModule,
 	],
-	controllers: [
-		AppController,
-		PricingController,
-		BookingController,
-		ServicesController,
-		InvoiceController,
-		PaymentController,
-		ShiftController,
-		EquipmentController,
-	],
+	controllers: [AppController],
 	providers: [AppService, JwtStrategy],
 })
 export class AppModule {}

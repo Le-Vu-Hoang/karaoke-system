@@ -4,16 +4,16 @@ import Stripe from 'stripe';
 
 @Injectable()
 export class StripeStrategy implements PaymentStrategy {
-	private readonly stripe: Stripe;
+	private readonly stripe: InstanceType<typeof Stripe>;
 	private readonly logger = new Logger(StripeStrategy.name);
 
 	constructor(
 		private readonly secretKey: string,
 		private readonly webhookSecret: string,
-		private readonly defaultCurrency: string = 'usd',
+		private readonly defaultCurrency: string = 'vnd',
 	) {
 		this.stripe = new Stripe(this.secretKey, {
-			apiVersion: '2023-10-16',
+			apiVersion: '2026-05-27.dahlia',
 		});
 	}
 
@@ -39,7 +39,7 @@ export class StripeStrategy implements PaymentStrategy {
 		}
 	}
 
-	verifyWebhook(payload: Buffer, signature: string): Stripe.Event {
+	verifyWebhook(payload: Buffer, signature: string): any {
 		try {
 			return this.stripe.webhooks.constructEvent(payload, signature, this.webhookSecret);
 		} catch (error) {
