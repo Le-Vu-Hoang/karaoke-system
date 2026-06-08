@@ -1,0 +1,31 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: ktv_redis_data
+    ports:
+      - "4924:4924"
+    volumes:
+      - redis_local_data:/data
+    restart: unless-stopped
+    networks:
+      - ktv-network
+    healthcheck:
+      test: [ "CMD-SHELL", "REDISCLI_AUTH=tuilahoang redis-cli -p 4924 ping | grep PONG" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    command: >
+      redis-server 
+      --requirepass "tuilahoang" 
+      --port 4924 
+      --appendonly yes 
+      --maxmemory 256mb 
+      --maxmemory-policy allkeys-lru
+
+networks:
+  ktv-network:
+    driver: bridge
+
+volumes:
+  redis_local_data:
