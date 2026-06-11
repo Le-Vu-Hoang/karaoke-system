@@ -44,7 +44,7 @@ export class InvoiceService {
 
 	async findAll() {
 		return await this.prisma.invoice.findMany({
-			where: { isDeleted: false },
+			where: { is_deleted: false },
 			include: { room: true, staff: true, booking: true },
 			orderBy: { startTime: 'desc' },
 		});
@@ -55,7 +55,7 @@ export class InvoiceService {
 			where: { id },
 			include: { invoiceItems: { include: { service: true } }, room: true },
 		});
-		if (!invoice || invoice.isDeleted) throw new NotFoundException('Invoice not found');
+		if (!invoice || invoice.is_deleted) throw new NotFoundException('Invoice not found');
 		return invoice;
 	}
 
@@ -134,7 +134,7 @@ export class InvoiceService {
 
 		return await this.prisma.invoice.update({
 			where: { id },
-			data: { isDeleted: true, reason },
+			data: { is_deleted: true, reason },
 		});
 	}
 }

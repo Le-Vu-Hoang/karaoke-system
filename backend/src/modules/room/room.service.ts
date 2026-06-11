@@ -127,7 +127,7 @@ export class RoomService {
 				skip,
 				take,
 				where: {
-					isDeleted: false,
+					is_deleted: false,
 				},
 				orderBy: { roomNumber: 'asc' },
 				include: {
@@ -136,7 +136,7 @@ export class RoomService {
 			}),
 			this.prisma.room.count({
 				where: {
-					isDeleted: false,
+					is_deleted: false,
 				},
 			}),
 		]);
@@ -248,7 +248,7 @@ export class RoomService {
 		await this.prisma.room.update({
 			where: { id },
 			data: {
-				isDeleted: true,
+				is_deleted: true,
 			},
 		});
 

@@ -1,19 +1,12 @@
-enum Role {
-  CUSTOMER
-  STAFF
-  ADMIN
-}
-
 model User {
-  id           String   @id @default(uuid(7)) @db.Uuid
-  fullName     String
-  phoneNumber  String   @unique
-  email        String?  @unique
-  passwordHash String
-  refreshToken String?  @unique
-  role         Role     @default(CUSTOMER)
-  createdAt    DateTime @default(now())
-
+  fullName       String
+  phoneNumber    String          @unique
+  email          String?         @unique
+  passwordHash   String
+  role           Role            @default(CUSTOMER)
+  createdAt      DateTime        @default(now())
+  id             String          @id @default(uuid(7)) @db.Uuid
+  refreshToken   String?         @unique
   bookings       Booking[]       @relation("CustomerBookings")
   invoices       Invoice[]       @relation("StaffInvoices")
   purchaseOrders PurchaseOrder[] @relation("StaffPurchaseOrders")
@@ -21,4 +14,10 @@ model User {
 
   @@index([phoneNumber])
   @@map("users")
+}
+
+enum Role {
+  CUSTOMER
+  STAFF
+  ADMIN
 }
