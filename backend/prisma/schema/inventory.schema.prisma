@@ -1,84 +1,65 @@
-enum InventoryChangeType {
-  IMPORT
-  SALE
-  DAMAGE
-}
-
 model ServiceCategory {
-  id           String  @id @default(uuid(7)) @db.Uuid
-  name         String  @unique
-  description  String? @db.Text
-  displayOrder Int     @default(0)
-  isActive     Boolean @default(true)
-
-  services Service[]
+  id           String    @id @default(uuid(7)) @db.Uuid
+  name         String    @unique
+  description  String?
+  displayOrder Int       @default(0)
+  isActive     Boolean   @default(true)
+  services     Service[]
 
   @@map("service_categories")
 }
 
 model Service {
-  id            String  @id @default(uuid(7)) @db.Uuid
-  categoryId    String  @db.Uuid
-  name          String
-  price         Decimal @db.Decimal(10, 2)
-  stockQuantity Int     @default(0)
-  isActive      Boolean @default(true)
-
-  category      ServiceCategory     @relation(fields: [categoryId], references: [id])
-  invoiceItems  InvoiceService[]
-  inventoryLogs InventoryLog[]
-  purchaseItems PurchaseOrderItem[]
+  id                   String                 @id @default(uuid(7)) @db.Uuid
+  name                 String
+  price                Decimal                @db.Decimal(10, 2)
+  stockQuantity        Int                    @default(0)
+  categoryId           String                 @db.Uuid
+  isActive             Boolean                @default(true)
+  inventoryLogs        InventoryLog[]
+  invoiceItems         InvoiceService[]
+  purchase_order_items purchase_order_items[]
+  category             ServiceCategory        @relation(fields: [categoryId], references: [id])
 
   @@map("services")
 }
 
 model Supplier {
-  id          String @id @default(uuid(7)) @db.Uuid
-  name        String
-  phoneNumber String
-
+  name           String
+  phoneNumber    String
+  id             String          @id @default(uuid(7)) @db.Uuid
   purchaseOrders PurchaseOrder[]
 
   @@map("suppliers")
 }
 
 model PurchaseOrder {
-  id          String   @id @default(uuid(7)) @db.Uuid
-  supplierId  String   @db.Uuid
-  staffId     String   @db.Uuid
-  totalAmount Decimal  @db.Decimal(10, 2)
-  orderDate   DateTime @default(now())
-
-  supplier Supplier @relation(fields: [supplierId], references: [id])
-  staff    User     @relation("StaffPurchaseOrders", fields: [staffId], references: [id])
-
-  items PurchaseOrderItem[]
+  totalAmount          Decimal                @db.Decimal(10, 2)
+  orderDate            DateTime               @default(now())
+  id                   String                 @id @default(uuid(7)) @db.Uuid
+  supplierId           String                 @db.Uuid
+  staffId              String                 @db.Uuid
+  purchase_order_items purchase_order_items[]
+  staff                User                   @relation("StaffPurchaseOrders", fields: [staffId], references: [id])
+  supplier             Supplier               @relation(fields: [supplierId], references: [id])
 
   @@map("purchase_orders")
 }
 
-model PurchaseOrderItem {
-  id              String  @id @default(uuid(7)) @db.Uuid
-  purchaseOrderId String  @db.Uuid
-  serviceId       String  @db.Uuid
-  quantity        Int
-  unitPrice       Decimal @db.Decimal(10, 2)
-
-  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
-  service       Service       @relation(fields: [serviceId], references: [id])
-
-  @@map("purchase_order_items")
-}
-
 model InventoryLog {
-  id              String              @id @default(uuid(7)) @db.Uuid
-  serviceId       String              @db.Uuid
   changeType      InventoryChangeType
   quantityChanged Int
-  referenceId     String?             @db.Uuid
   createdAt       DateTime            @default(now())
-
-  service Service @relation(fields: [serviceId], references: [id])
+  id              String              @id @default(uuid(7)) @db.Uuid
+  serviceId       String              @db.Uuid
+  referenceId     String?             @db.Uuid
+  service         Service             @relation(fields: [serviceId], references: [id])
 
   @@map("inventory_logs")
+}
+
+enum InventoryChangeType {
+  IMPORT
+  SALE
+  DAMAGE
 }

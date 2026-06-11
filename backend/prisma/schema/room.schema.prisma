@@ -1,47 +1,44 @@
-enum RoomStatus {
-  AVAILABLE
-  IN_USE
-  MAINTENANCE
-}
-
 model RoomType {
-  id               String  @id @default(uuid(7)) @db.Uuid
-  name             String  @unique
+  name             String      @unique
   capacity         Int
-  basePricePerHour Decimal @db.Decimal(10, 2)
-  description      String? @db.Text
-
-  rooms      Room[]
-  bookings   Booking[]
-  priceRules PriceRule[]
+  basePricePerHour Decimal     @db.Decimal(10, 2)
+  description      String?
+  id               String      @id @default(uuid(7)) @db.Uuid
+  bookings         Booking[]
+  priceRules       PriceRule[]
+  rooms            Room[]
 
   @@map("room_types")
 }
 
 model Room {
-  id         String     @id @default(uuid(7)) @db.Uuid
-  roomTypeId String     @db.Uuid
-  roomNumber String     @unique
-  status     RoomStatus @default(AVAILABLE)
-  isDeleted  Boolean    @default(false) @map("is_deleted")
-
-  roomType   RoomType    @relation(fields: [roomTypeId], references: [id])
+  roomNumber String      @unique
+  status     RoomStatus  @default(AVAILABLE)
+  id         String      @id @default(uuid(7)) @db.Uuid
+  roomTypeId String      @db.Uuid
+  is_deleted Boolean     @default(false)
   bookings   Booking[]
-  invoices   Invoice[]
   equipments Equipment[]
+  invoices   Invoice[]
+  roomType   RoomType    @relation(fields: [roomTypeId], references: [id])
 
   @@map("rooms")
 }
 
 model PriceRule {
+  dayOfWeek    Int
+  startTime    DateTime @db.Time(6)
+  endTime      DateTime @db.Time(6)
+  pricePerHour Decimal  @db.Decimal(10, 2)
   id           String   @id @default(uuid(7)) @db.Uuid
   roomTypeId   String   @db.Uuid
-  dayOfWeek    Int
-  startTime    DateTime @db.Time()
-  endTime      DateTime @db.Time()
-  pricePerHour Decimal  @db.Decimal(10, 2)
-
-  roomType RoomType @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+  roomType     RoomType @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
 
   @@map("price_rules")
+}
+
+enum RoomStatus {
+  AVAILABLE
+  IN_USE
+  MAINTENANCE
 }

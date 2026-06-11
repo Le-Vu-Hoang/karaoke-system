@@ -1,36 +1,23 @@
-enum EquipmentStatus {
-  ACTIVE
-  REPAIRING
-  BROKEN
-}
-
-enum ShiftStatus {
-  OPEN
-  CLOSED
-}
-
 model Shift {
-  id           String      @id @default(uuid(7)) @db.Uuid
-  staffId      String      @db.Uuid
   startTime    DateTime    @default(now())
   endTime      DateTime?
-  status       ShiftStatus @default(OPEN)
   startingCash Decimal     @db.Decimal(10, 2)
   endingCash   Decimal?    @db.Decimal(10, 2)
   expectedCash Decimal?    @db.Decimal(10, 2)
-
-  staff User @relation("StaffShifts", fields: [staffId], references: [id])
+  id           String      @id @default(uuid(7)) @db.Uuid
+  staffId      String      @db.Uuid
+  status       ShiftStatus @default(OPEN)
+  staff        User        @relation("StaffShifts", fields: [staffId], references: [id])
 
   @@map("shifts")
 }
 
 model Equipment {
-  id           String          @id @default(uuid(7)) @db.Uuid
-  roomId       String          @db.Uuid
   name         String
-  serialNumber String?         @unique
-  status       EquipmentStatus @default(ACTIVE)
-
+  serialNumber String?          @unique
+  status       EquipmentStatus  @default(ACTIVE)
+  id           String           @id @default(uuid(7)) @db.Uuid
+  roomId       String           @db.Uuid
   room         Room             @relation(fields: [roomId], references: [id])
   maintenances MaintenanceLog[]
 
@@ -38,13 +25,18 @@ model Equipment {
 }
 
 model MaintenanceLog {
-  id              String   @id @default(uuid(7)) @db.Uuid
-  equipmentId     String   @db.Uuid
-  maintenanceDate DateTime @default(now())
-  description     String   @db.Text
-  cost            Decimal  @db.Decimal(10, 2)
-
-  equipment Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  maintenanceDate DateTime  @default(now())
+  description     String
+  cost            Decimal   @db.Decimal(10, 2)
+  id              String    @id @default(uuid(7)) @db.Uuid
+  equipmentId     String    @db.Uuid
+  equipment       Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
 
   @@map("maintenance_logs")
+}
+
+enum EquipmentStatus {
+  ACTIVE
+  REPAIRING
+  BROKEN
 }

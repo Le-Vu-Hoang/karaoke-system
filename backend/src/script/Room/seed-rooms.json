@@ -1,0 +1,58 @@
+[
+  {
+    "name": "Phòng Thường",
+    "capacity": 10,
+    "basePricePerHour": 100000,
+    "description": "Phòng Karaoke tiêu chuẩn",
+    "priceRules": [
+      {
+        "dayOfWeek": 0,
+        "startTime": "18:00",
+        "endTime": "23:59",
+        "pricePerHour": 150000
+      },
+      {
+        "dayOfWeek": 6,
+        "startTime": "18:00",
+        "endTime": "23:59",
+        "pricePerHour": 150000
+      }
+    ],
+    "rooms": [
+      {
+        "roomNumber": "T101",
+        "status": "AVAILABLE"
+      },
+      {
+        "roomNumber": "T102",
+        "status": "AVAILABLE"
+      }
+    ]
+  },
+  {
+    "name": "Phòng VIP",
+    "capacity": 20,
+    "basePricePerHour": 200000,
+    "description": "Phòng Karaoke VIP",
+    "priceRules": [
+      {
+        "dayOfWeek": 0,
+        "startTime": "18:00",
+        "endTime": "23:59",
+        "pricePerHour": 250000
+      },
+      {
+        "dayOfWeek": 6,
+        "startTime": "18:00",
+        "endTime": "23:59",
+        "pricePerHour": 250000
+      }
+    ],
+    "rooms": [
+      {
+        "roomNumber": "V201",
+        "status": "AVAILABLE"
+      }
+    ]
+  }
+]

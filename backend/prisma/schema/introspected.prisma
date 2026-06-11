@@ -1,0 +1,14 @@
+model purchase_order_items {
+  id              String        @id @default(uuid(7)) @db.Uuid
+  purchaseOrderId String        @db.Uuid
+  serviceId       String        @db.Uuid
+  quantity        Int
+  unitPrice       Decimal       @db.Decimal(10, 2)
+  purchase_orders PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  services        Service       @relation(fields: [serviceId], references: [id])
+}
+
+enum ShiftStatus {
+  OPEN
+  CLOSED
+}
