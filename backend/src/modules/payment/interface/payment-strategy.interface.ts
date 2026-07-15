@@ -1,6 +1,7 @@
 export interface PaymentIntentResult {
 	transactionId: string;
-	clientSecret: string;
+	clientSecret?: string;
+	paymentUrl?: string;
 }
 
 export interface PaymentStrategy {
@@ -10,5 +11,5 @@ export interface PaymentStrategy {
 		metadata?: Record<string, string>,
 	): Promise<PaymentIntentResult>;
 
-	verifyWebhook(payload: Buffer, signature: string): any;
+	verifyWebhook(payload: any, signature?: string): any;
 }

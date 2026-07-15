@@ -84,18 +84,18 @@ export class BookingSummaryResponseDto {
 	guestName?: string | null;
 
 	/**
-	 * Thời gian khách dự kiến đến nhận phòng.
+	 * Thời gian nhận phòng dự kiến.
 	 */
 	@Expose()
-	bookingTime: Date;
+	@Type(() => Date)
+	startTime: Date;
 
 	/**
-	 * Số giờ dự kiến hát.
-	 *
-	 * @example 2
+	 * Thời gian trả phòng dự kiến.
 	 */
 	@Expose()
-	durationExpected: number;
+	@Type(() => Date)
+	endTime: Date;
 
 	/**
 	 * Trạng thái hiện tại của Booking.

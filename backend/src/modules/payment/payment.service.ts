@@ -1,27 +1,44 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, BadRequestException } from '@nestjs/common';
 import type { PaymentIntentResult, PaymentStrategy } from './interface/payment-strategy.interface';
 import { PrismaService } from '../../prisma/prisma.service';
+import { STRIPE_STRATEGY } from './payment.module';
+import { MomoStrategy } from './strategies/momo.strategy';
+import { VNPayStrategy } from './strategies/vnpay.strategy';
 
-export const PAYMENT_STRATEGY_TOKEN = 'PAYMENT_STRATEGY_TOKEN';
+export type PaymentProvider = 'STRIPE' | 'MOMO' | 'VNPAY';
 
 @Injectable()
 export class PaymentService {
 	private readonly logger = new Logger(PaymentService.name);
 
 	constructor(
-		@Inject(PAYMENT_STRATEGY_TOKEN) private readonly strategy: PaymentStrategy,
+		@Inject(STRIPE_STRATEGY) private readonly stripeStrategy: PaymentStrategy,
+		private readonly momoStrategy: MomoStrategy,
+		private readonly vnPayStrategy: VNPayStrategy,
 		private readonly prisma: PrismaService,
 	) {}
 
-	async createTransaction(
-		amount: number,
-		metadata?: Record<string, string>,
-	): Promise<PaymentIntentResult> {
-		return this.strategy.createPaymentIntent(amount, 'usd', metadata);
+	private getStrategy(provider: PaymentProvider): PaymentStrategy {
+		switch (provider) {
+			case 'STRIPE':
+				return this.stripeStrategy;
+			case 'MOMO':
+				return this.momoStrategy;
+			case 'VNPAY':
+				return this.vnPayStrategy;
+			default:
+				throw new BadRequestException(`Unsupported payment provider: ${provider}`);
+		}
 	}
 
-	async verifyAndProcessWebhook(payload: Buffer, signature: string) {
-		const event = this.strategy.verifyWebhook(payload, signature) as {
+	async createTransaction(amount: number, provider: PaymentProvider = 'STRIPE', metadata?: Record<string, string>): Promise<PaymentIntentResult> {
+		const strategy = this.getStrategy(provider);
+		return strategy.createPaymentIntent(amount, 'usd', metadata);
+	}
+
+	async verifyAndProcessWebhook(provider: PaymentProvider, payload: any, signature?: string) {
+		const strategy = this.getStrategy(provider);
+		const event = strategy.verifyWebhook(payload, signature) as {
 			type: string;
 			data: { object: Record<string, unknown> };
 		};
@@ -41,7 +58,7 @@ export class PaymentService {
 		return event;
 	}
 
-	private async handleBookingDepositSuccess(bookingId: string, stripeAmount: number) {
+	private async handleBookingDepositSuccess(bookingId: string, paidAmount: number) {
 		this.logger.log(`Processing successful deposit for booking ${bookingId}`);
 
 		// 1. Lấy thông tin booking hiện tại
@@ -58,8 +75,8 @@ export class PaymentService {
 		await this.prisma.payment.create({
 			data: {
 				bookingId: bookingId,
-				amount: booking.deposit || stripeAmount,
-				paymentMethod: 'CARD',
+				amount: booking.deposit || paidAmount,
+				paymentMethod: 'CARD', // We can update this based on provider in future
 				paymentType: 'DEPOSIT',
 			},
 		});
@@ -67,3 +84,4 @@ export class PaymentService {
 		this.logger.log(`Booking ${bookingId} confirmed & deposit payment saved.`);
 	}
 }
+
