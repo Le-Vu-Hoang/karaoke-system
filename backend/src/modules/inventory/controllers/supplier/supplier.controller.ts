@@ -3,13 +3,12 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { SupplierService } from '../../services/supplier/supplier.service';
 import { CreateSupplierDto } from '../../dto/supplier/create-supplier.dto';
 import { UpdateSupplierDto } from '../../dto/supplier/update-supplier.dto';
-import { JwtAuthGuard } from '../../../../common/guards/jwt-auth.guard';
 import { RoleGuard } from '../../../../common/guards/role.guard';
 import { Roles } from '../../../../common/decorations/role.decorator';
 
 @ApiTags('Suppliers')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RoleGuard)
+@UseGuards(RoleGuard)
 @Roles('ADMIN')
 @Controller('inventory/suppliers')
 export class SupplierController {

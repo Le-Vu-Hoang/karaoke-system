@@ -9,16 +9,7 @@ import { InventoryLogService } from './services/inventory-log/inventory-log.serv
 
 @Module({
 	imports: [PrismaModule],
-	controllers: [
-		SupplierController,
-		PurchaseOrderController,
-		InventoryLogController,
-	],
-	providers: [
-		SupplierService,
-		PurchaseOrderService,
-		InventoryLogService,
-	],
+	controllers: [SupplierController, PurchaseOrderController, InventoryLogController],
+	providers: [SupplierService, PurchaseOrderService, InventoryLogService],
 })
 export class InventoryModule {}
-

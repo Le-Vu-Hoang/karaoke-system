@@ -1,5 +1,5 @@
-import { IsNotEmpty, IsString, Matches } from 'class-validator';
-import { Expose } from 'class-transformer';
+import { IsNotEmpty, IsPhoneNumber, IsString, Matches } from 'class-validator';
+import { Expose, Transform } from 'class-transformer';
 
 /**
  * DTO cho việc tạo mới Nhà cung cấp (Supplier)
@@ -10,6 +10,7 @@ export class CreateSupplierDto {
 	 * @example "Đại lý bia nước ngọt ABC"
 	 */
 	@Expose()
+	@Transform(({ value }): unknown => (typeof value === 'string' ? value.trim() : value))
 	@IsNotEmpty()
 	@IsString()
 	name: string;
@@ -18,9 +19,9 @@ export class CreateSupplierDto {
 	 * Số điện thoại nhà cung cấp
 	 * @example "0987654321"
 	 */
-	@Expose()
 	@IsNotEmpty()
-	@IsString()
-	@Matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/, { message: 'Số điện thoại không hợp lệ' })
+	@IsPhoneNumber('VN', { message: 'Please provide valid phone number' })
+	@IsNotEmpty({ message: 'Phone number is required' })
+	@Transform(({ value }): unknown => (typeof value === 'string' ? value.trim() : value))
 	phoneNumber: string;
 }

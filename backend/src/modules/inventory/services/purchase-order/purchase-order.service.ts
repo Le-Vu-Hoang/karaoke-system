@@ -26,18 +26,18 @@ export class PurchaseOrderService {
 					supplierId,
 					staffId,
 					totalAmount,
-					purchase_order_items: {
+					purchaseOrderItems: {
 						create: items.map((item) => ({
 							quantity: item.quantity,
 							unitPrice: item.unitPrice,
-							services: {
+							service: {
 								connect: { id: item.serviceId },
 							},
 						})),
 					},
 				},
 				include: {
-					purchase_order_items: true,
+					purchaseOrderItems: true,
 				},
 			});
 
@@ -75,8 +75,8 @@ export class PurchaseOrderService {
 				staff: {
 					select: { id: true, fullName: true },
 				},
-				purchase_order_items: {
-					include: { services: true },
+				purchaseOrderItems: {
+					include: { service: true },
 				},
 			},
 			orderBy: { orderDate: 'desc' },
@@ -91,8 +91,8 @@ export class PurchaseOrderService {
 				staff: {
 					select: { id: true, fullName: true },
 				},
-				purchase_order_items: {
-					include: { services: true },
+				purchaseOrderItems: {
+					include: { service: true },
 				},
 			},
 		});

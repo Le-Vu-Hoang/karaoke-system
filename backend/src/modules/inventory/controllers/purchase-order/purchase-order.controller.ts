@@ -2,14 +2,13 @@ import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { PurchaseOrderService } from '../../services/purchase-order/purchase-order.service';
 import { CreatePurchaseOrderDto } from '../../dto/purchase-order/create-purchase-order.dto';
-import { JwtAuthGuard } from '../../../../common/guards/jwt-auth.guard';
 import { RoleGuard } from '../../../../common/guards/role.guard';
 import { Roles } from '../../../../common/decorations/role.decorator';
 import { GetUser } from '../../../../common/decorations/get-user.decorator';
 
 @ApiTags('Purchase Orders')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RoleGuard)
+@UseGuards(RoleGuard)
 @Roles('ADMIN')
 @Controller('inventory/purchase-orders')
 export class PurchaseOrderController {

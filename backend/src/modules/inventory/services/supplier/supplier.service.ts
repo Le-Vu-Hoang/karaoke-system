@@ -38,7 +38,7 @@ export class SupplierService {
 
 	async update(id: string, updateSupplierDto: UpdateSupplierDto) {
 		await this.findOne(id); // Ensure exists
-		
+
 		if (updateSupplierDto.phoneNumber) {
 			const existing = await this.prisma.supplier.findFirst({
 				where: { phoneNumber: updateSupplierDto.phoneNumber },

@@ -8,7 +8,7 @@ export class InventoryLogService {
 
 	async findAll(query: QueryInventoryLogDto) {
 		const { serviceId, changeType } = query;
-		
+
 		const where: any = {};
 		if (serviceId) where.serviceId = serviceId;
 		if (changeType) where.changeType = changeType;
@@ -17,8 +17,8 @@ export class InventoryLogService {
 			where,
 			include: {
 				service: {
-					include: { category: true }
-				}
+					include: { category: true },
+				},
 			},
 			orderBy: { createdAt: 'desc' },
 		});
