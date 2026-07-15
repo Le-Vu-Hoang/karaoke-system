@@ -14,9 +14,7 @@ export class ShiftService {
 			where: { staffId, status: ShiftStatus.OPEN },
 		});
 		if (existingShift) {
-			throw new BadRequestException(
-				'You currently have an open shift. Please close it before opening a new one.',
-			);
+			throw new BadRequestException('You currently have an open shift. Please close it before opening a new one.');
 		}
 
 		return this.prisma.shift.create({

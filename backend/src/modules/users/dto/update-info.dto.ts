@@ -1,6 +1,15 @@
-import { IsOptional, IsString, IsPhoneNumber, MaxLength, IsEmail } from 'class-validator';
+import { IsOptional, IsString, IsPhoneNumber, MaxLength, IsEmail, IsUrl } from 'class-validator';
 
 export class UpdateUserInfoDto {
+	/**
+	 * Profile image URL
+	 * @example "https://res.cloudinary.com/...image.jpg"
+	 */
+	@IsOptional()
+	@IsString({ message: 'Image URL must be a string' })
+	@IsUrl({}, { message: 'Image URL must be a valid URL' })
+	imageUrl?: string;
+
 	/**
 	 * Full name of the user
 	 * @example "Nguyen Van A"

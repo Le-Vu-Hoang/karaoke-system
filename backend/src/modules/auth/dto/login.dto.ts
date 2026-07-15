@@ -6,7 +6,7 @@ export class LoginDto {
 	 * @example "0123456789"
 	 */
 	@IsString()
-	@IsPhoneNumber('VI', { message: 'Invalid phone number' })
+	@IsPhoneNumber('VN', { message: 'Invalid phone number' })
 	@IsNotEmpty({ message: 'Invalid phone number' })
 	phoneNumber: string;
 

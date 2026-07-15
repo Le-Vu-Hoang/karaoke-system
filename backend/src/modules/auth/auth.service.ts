@@ -50,6 +50,7 @@ export class AuthService {
 					fullName: true,
 					phoneNumber: true,
 					role: true,
+					imageUrl: true,
 				},
 			});
 
@@ -72,9 +73,7 @@ export class AuthService {
 	}
 
 	//# Generate access token and refresh token
-	private async generateTokens(
-		userId: string,
-	): Promise<{ accessToken: string; refreshToken: string }> {
+	private async generateTokens(userId: string): Promise<{ accessToken: string; refreshToken: string }> {
 		const payload = { sub: userId };
 		const refreshId = randomBytes(16).toString('hex');
 		const [accessToken, refreshToken] = await Promise.all([
@@ -109,6 +108,7 @@ export class AuthService {
 				fullName: true,
 				phoneNumber: true,
 				role: true,
+				imageUrl: true,
 			},
 		});
 
@@ -126,6 +126,7 @@ export class AuthService {
 				fullName: user.fullName,
 				phoneNumber: user.phoneNumber,
 				role: user.role,
+				imageUrl: user.imageUrl,
 			},
 		};
 	}
@@ -160,6 +161,7 @@ export class AuthService {
 				phoneNumber: user.phoneNumber,
 				email: user.email || 'No email found',
 				role: user.role,
+				imageUrl: user.imageUrl,
 			},
 		};
 	}

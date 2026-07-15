@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Param, Patch, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RoleGuard } from '../../common/guards/role.guard';
 import { UsersService } from './users.service';
 import { UserResponseDto } from './dto/user-response.dto';
@@ -16,7 +15,7 @@ import { ApiAuthErrors } from '../../common/decorations/api-auth-error.decorator
 
 @ApiTags('Users')
 @ApiBearerAuth('JWT')
-@UseGuards(JwtAuthGuard, RoleGuard)
+@UseGuards(RoleGuard)
 @Controller('users')
 export class UsersController {
 	constructor(private readonly usersService: UsersService) {}
@@ -42,9 +41,7 @@ export class UsersController {
 	@ApiOperation({ summary: 'Lấy danh sách tất cả người dùng (Có phân trang)' })
 	@ApiPaginatedResponse(UserResponseDto)
 	@ApiAuthErrors()
-	async getAllUsers(
-		@Query() query: PaginationQueryDto,
-	): Promise<PaginatedResponseDto<UserResponseDto>> {
+	async getAllUsers(@Query() query: PaginationQueryDto): Promise<PaginatedResponseDto<UserResponseDto>> {
 		return await this.usersService.findAll(query);
 	}
 
@@ -58,10 +55,7 @@ export class UsersController {
 	})
 	@ApiResponse({ status: 400, description: 'Dữ liệu đầu vào không hợp lệ (Validation Error)' })
 	@ApiAuthErrors()
-	async updateUserInfo(
-		@GetUser('id') userId: string,
-		@Body() body: UpdateUserInfoDto,
-	): Promise<UserResponseDto> {
+	async updateUserInfo(@GetUser('id') userId: string, @Body() body: UpdateUserInfoDto): Promise<UserResponseDto> {
 		return await this.usersService.updateCurrentUser(userId, body);
 	}
 
@@ -78,10 +72,7 @@ export class UsersController {
 		description: 'Dữ liệu đầu vào không hợp lệ (Mật khẩu không đủ mạnh)',
 	})
 	@ApiAuthErrors()
-	async changePassword(
-		@GetUser('id') userId: string,
-		@Body() body: ChangePasswordDto,
-	): Promise<string> {
+	async changePassword(@GetUser('id') userId: string, @Body() body: ChangePasswordDto): Promise<string> {
 		return await this.usersService.changePassword(userId, body);
 	}
 }

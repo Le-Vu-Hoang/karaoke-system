@@ -36,6 +36,13 @@ class UserResponseData {
 	 */
 	@Expose()
 	role: Role;
+
+	/**
+	 * Profile image URL
+	 * @example "https://res.cloudinary.com/...image.jpg"
+	 */
+	@Expose()
+	imageUrl?: string | null;
 }
 
 export class AuthResponseDto {

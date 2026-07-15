@@ -38,6 +38,13 @@ export class UserResponseDto {
 	role: Role;
 
 	/**
+	 * Profile image URL
+	 * @example "https://res.cloudinary.com/...image.jpg"
+	 */
+	@Expose()
+	imageUrl: string | null;
+
+	/**
 	 * The time the account was registered on the system
 	 */
 	@Expose()

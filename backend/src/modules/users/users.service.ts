@@ -5,12 +5,7 @@ import { PaginatedResponseDto } from '../../common/dto/pagination-response.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserInfoDto } from './dto/update-info.dto';
-import {
-	BadRequestException,
-	ConflictException,
-	Injectable,
-	NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class UsersService {
@@ -26,6 +21,7 @@ export class UsersService {
 				email: true,
 				phoneNumber: true,
 				role: true,
+				imageUrl: true,
 				createdAt: true,
 			},
 		});
@@ -55,6 +51,7 @@ export class UsersService {
 					phoneNumber: true,
 					email: true,
 					role: true,
+					imageUrl: true,
 					createdAt: true,
 				},
 			}),
@@ -78,7 +75,7 @@ export class UsersService {
 
 	//# Update profile user
 	async updateCurrentUser(userId: string, body: UpdateUserInfoDto): Promise<UserResponseDto> {
-		const { fullName, phoneNumber, email } = body;
+		const { fullName, phoneNumber, email, imageUrl } = body;
 
 		const currentUser = await this.prisma.user.findUnique({
 			where: { id: userId },
@@ -114,6 +111,7 @@ export class UsersService {
 				...(fullName && { fullName: fullName }),
 				...(phoneNumber && { phoneNumber: phoneNumber }),
 				...(email && { email: email }),
+				...(imageUrl !== undefined && { imageUrl: imageUrl }),
 			},
 			select: {
 				id: true,
@@ -121,6 +119,7 @@ export class UsersService {
 				phoneNumber: true,
 				email: true,
 				role: true,
+				imageUrl: true,
 				createdAt: true,
 			},
 		}) as unknown as UserResponseDto;

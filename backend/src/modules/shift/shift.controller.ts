@@ -4,7 +4,6 @@ import { CreateShiftDto } from './dto/create-shift.dto';
 import { CloseShiftDto } from './dto/close-shift.dto';
 import { ShiftQueryDto } from './dto/shift-query.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RoleGuard } from '../../common/guards/role.guard';
 import { Roles } from '../../common/decorations/role.decorator';
 import { Role } from '@prisma/client';
@@ -15,7 +14,7 @@ import { ShiftResponseDto } from './dto/shift-response.dto';
 
 @ApiTags('Shifts')
 @ApiBearerAuth('JWT')
-@UseGuards(JwtAuthGuard, RoleGuard)
+@UseGuards(RoleGuard)
 @Controller('shifts')
 @Serialize(ShiftResponseDto)
 export class ShiftController {
@@ -35,11 +34,7 @@ export class ShiftController {
 	@ApiOperation({ summary: 'Đóng ca làm việc hiện tại' })
 	@ApiResponse({ status: 200, description: 'Đóng ca thành công.' })
 	@ApiAuthErrors()
-	closeShift(
-		@Param('id') id: string,
-		@GetUser('id') staffId: string,
-		@Body() closeShiftDto: CloseShiftDto,
-	) {
+	closeShift(@Param('id') id: string, @GetUser('id') staffId: string, @Body() closeShiftDto: CloseShiftDto) {
 		return this.shiftService.closeShift(id, staffId, closeShiftDto);
 	}
 
@@ -48,11 +43,7 @@ export class ShiftController {
 	@ApiOperation({ summary: 'Lấy danh sách ca làm việc' })
 	@ApiResponse({ status: 200, description: 'Lấy danh sách thành công.' })
 	@ApiAuthErrors()
-	findAll(
-		@Query() query: ShiftQueryDto,
-		@GetUser('role') role: string,
-		@GetUser('id') staffId: string,
-	) {
+	findAll(@Query() query: ShiftQueryDto, @GetUser('role') role: string, @GetUser('id') staffId: string) {
 		return this.shiftService.findAll(query, role, staffId);
 	}
 
