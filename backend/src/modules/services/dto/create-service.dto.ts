@@ -1,10 +1,21 @@
-import { IsNotEmpty, IsString, IsNumber, IsOptional, Min, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsOptional, Min, IsUUID, IsUrl } from 'class-validator';
 import { Expose } from 'class-transformer';
 
 /**
  * Data Transfer Object cho việc tạo mới dịch vụ/món ăn.
  */
 export class CreateServiceDto {
+	/**
+	 * URL hình ảnh của dịch vụ/món ăn.
+	 *
+	 * @example https://res.cloudinary.com/...image.jpg
+	 */
+	@Expose()
+	@IsString()
+	@IsUrl({}, { message: 'Đường dẫn ảnh không hợp lệ' })
+	@IsOptional()
+	imageUrl?: string;
+
 	/**
 	 * ID của danh mục (ServiceCategory) chứa dịch vụ này.
 	 *

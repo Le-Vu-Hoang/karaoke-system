@@ -9,35 +9,73 @@ import {
 import { ServicesService } from './services.service';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
+import { CreateServiceCategoryDto } from './dto/create-service-category.dto';
+import { UpdateServiceCategoryDto } from './dto/update-service-category.dto';
+import { ServiceCategoryResponseDto } from './dto/service-category-response.dto';
 import { Role } from '@prisma/client';
 
-import {
-	Body,
-	Controller,
-	Delete,
-	Get,
-	Param,
-	Patch,
-	Post,
-	Query,
-	UseGuards,
-} from '@nestjs/common';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { RoleGuard } from '../../common/guards/role.guard';
 import { Roles } from '../../common/decorations/role.decorator';
 import { PaginationQueryDto } from '../../common/dto/pagination.dto';
 import { ServiceResponseDto } from './dto/service-response.dto';
 import { ApiAuthErrors } from '../../common/decorations/api-auth-error.decorator';
 import { Serialize } from '../../common/interceptors/serialize.interceptor';
+import { PaginatedResponseDto } from '../../common/dto/pagination-response.dto';
+import { Public } from '../../common/decorations/puclic.decorator';
 
 @ApiTags('Services (Dịch vụ & Món ăn)')
 @ApiBearerAuth('JWT-auth')
-@UseGuards(JwtAuthGuard, RoleGuard)
+@UseGuards(RoleGuard)
 @Controller('services')
 export class ServicesController {
 	constructor(private readonly servicesService: ServicesService) {}
 
-	//# Create new service on system
+	//# --- CATEGORIES ---
+	@Post('categories')
+	@Roles(Role.ADMIN)
+	@ApiOperation({ summary: 'Thêm mới danh mục dịch vụ' })
+	@ApiCreatedResponse({ description: 'Tạo danh mục thành công', type: ServiceCategoryResponseDto })
+	@ApiAuthErrors()
+	@ApiBadRequestResponse({ description: 'Dữ liệu không hợp lệ' })
+	@Serialize(ServiceCategoryResponseDto)
+	createCategory(@Body() dto: CreateServiceCategoryDto) {
+		return this.servicesService.createCategory(dto);
+	}
+
+	@Get('categories')
+	@ApiOperation({ summary: 'Lấy danh sách danh mục' })
+	@ApiOkResponse({ type: [ServiceCategoryResponseDto] })
+	@ApiAuthErrors()
+	@Public()
+	@Serialize(ServiceCategoryResponseDto)
+	getAllCategories() {
+		return this.servicesService.getAllCategories();
+	}
+
+	@Patch('categories/:id')
+	@Roles(Role.ADMIN)
+	@ApiOperation({ summary: 'Cập nhật danh mục' })
+	@ApiOkResponse({ type: ServiceCategoryResponseDto })
+	@ApiAuthErrors()
+	@ApiBadRequestResponse({ description: 'Dữ liệu không hợp lệ' })
+	@Serialize(ServiceCategoryResponseDto)
+	updateCategory(@Param('id') id: string, @Body() dto: UpdateServiceCategoryDto) {
+		return this.servicesService.updateCategory(id, dto);
+	}
+
+	@Delete('categories/:id')
+	@Roles(Role.ADMIN)
+	@ApiOperation({ summary: 'Vô hiệu hóa danh mục' })
+	@ApiOkResponse({
+		schema: { example: { message: 'Category disabled successfully!' } },
+	})
+	@ApiAuthErrors()
+	deleteCategory(@Param('id') id: string) {
+		return this.servicesService.deleteCategory(id);
+	}
+
+	//# --- SERVICES ---
 	@Post()
 	@Roles(Role.ADMIN, Role.STAFF)
 	@ApiOperation({ summary: 'Thêm mới dịch vụ/món ăn' })
@@ -51,11 +89,13 @@ export class ServicesController {
 
 	//# Get all services (menu)
 	@Get()
-	@Roles(Role.ADMIN, Role.STAFF, Role.CUSTOMER)
 	@ApiOperation({ summary: 'Lấy danh sách dịch vụ (Menu)' })
-	@ApiOkResponse({ description: 'Lấy danh sách thành công' })
-	@ApiAuthErrors()
+	@ApiOkResponse({
+		description: 'Lấy danh sách thành công',
+		type: PaginatedResponseDto<ServiceResponseDto>,
+	})
 	@ApiBadRequestResponse({ description: 'Số trang không hợp lệ' })
+	@Public()
 	@Serialize(ServiceResponseDto)
 	findAll(@Query() query: PaginationQueryDto) {
 		return this.servicesService.getAllServices(query);

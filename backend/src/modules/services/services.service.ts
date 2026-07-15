@@ -3,6 +3,8 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { PaginationQueryDto } from '../../common/dto/pagination.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
+import { CreateServiceCategoryDto } from './dto/create-service-category.dto';
+import { UpdateServiceCategoryDto } from './dto/update-service-category.dto';
 
 @Injectable()
 export class ServicesService {
@@ -81,6 +83,42 @@ export class ServicesService {
 		});
 
 		return { message: 'Service disabled successfully!' };
+	}
+
+	//# --- Category Logic ---
+	async createCategory(dto: CreateServiceCategoryDto) {
+		return await this.prisma.serviceCategory.create({
+			data: dto,
+		});
+	}
+
+	async getAllCategories() {
+		return await this.prisma.serviceCategory.findMany({
+			where: { isActive: true },
+			orderBy: { displayOrder: 'asc' },
+		});
+	}
+
+	async updateCategory(id: string, dto: UpdateServiceCategoryDto) {
+		const category = await this.prisma.serviceCategory.findUnique({ where: { id } });
+		if (!category) throw new NotFoundException('Category not found!');
+
+		return await this.prisma.serviceCategory.update({
+			where: { id },
+			data: dto,
+		});
+	}
+
+	async deleteCategory(id: string) {
+		const category = await this.prisma.serviceCategory.findUnique({ where: { id } });
+		if (!category) throw new NotFoundException('Category not found!');
+
+		await this.prisma.serviceCategory.update({
+			where: { id },
+			data: { isActive: false },
+		});
+
+		return { message: 'Category disabled successfully!' };
 	}
 
 	//# --- Hàm Helper ---

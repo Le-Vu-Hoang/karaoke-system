@@ -36,7 +36,8 @@ export class ServiceResponseDto {
 	 * @example 25000.0
 	 */
 	@Expose()
-	@Transform(({ value }) =>
+	@Type(() => Number)
+	@Transform(({ value }): unknown =>
 		value && typeof value.toNumber === 'function' ? value.toNumber() : Number(value) || 0,
 	)
 	price: number;
@@ -56,6 +57,14 @@ export class ServiceResponseDto {
 	 */
 	@Expose()
 	isActive: boolean;
+
+	/**
+	 * URL hình ảnh của dịch vụ.
+	 *
+	 * @example https://res.cloudinary.com/...image.jpg
+	 */
+	@Expose()
+	imageUrl?: string | null;
 
 	/**
 	 * Thông tin chi tiết của danh mục (Có thể null nếu không include).

@@ -1,15 +1,4 @@
-import {
-	Controller,
-	Get,
-	Post,
-	Body,
-	Param,
-	Delete,
-	Put,
-	Query,
-	HttpCode,
-	HttpStatus,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Query, HttpCode, HttpStatus, Patch } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { PricingService } from './pricing.service';
 import { CreatePriceRuleDto } from './dto/create-price-rule.dto';
@@ -50,7 +39,7 @@ export class PricingController {
 		return this.pricingService.findRuleById(id);
 	}
 
-	@Put('rules/:id')
+	@Patch('rules/:id')
 	@ApiOperation({ summary: 'Cập nhật một luật giá' })
 	@ApiParam({ name: 'id', description: 'ID của luật giá' })
 	@ApiResponse({ status: HttpStatus.OK, description: 'Cập nhật thành công' })

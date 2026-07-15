@@ -29,6 +29,14 @@ export class ServiceCategoryResponseDto {
 	description?: string | null;
 
 	/**
+	 * URL hình ảnh của danh mục dịch vụ.
+	 *
+	 * @example https://res.cloudinary.com/...image.jpg
+	 */
+	@Expose()
+	imageUrl?: string | null;
+
+	/**
 	 * Thứ tự hiển thị trên Menu.
 	 *
 	 * @example 1
