@@ -45,9 +45,7 @@ export class RedisModule {
 						});
 
 						client.on('ready', () => {
-							RedisModule.logger.log(
-								`Successfully connected to Redis at ${config.host}:${config.port}`,
-							);
+							RedisModule.logger.log(`Successfully connected to Redis at ${config.host}:${config.port}`);
 						});
 
 						client.on('error', (err: Error) => {
