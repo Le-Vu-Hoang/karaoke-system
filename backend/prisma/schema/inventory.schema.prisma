@@ -2,6 +2,7 @@ model ServiceCategory {
   id           String    @id @default(uuid(7)) @db.Uuid
   name         String    @unique
   description  String?
+  imageUrl     String?
   displayOrder Int       @default(0)
   isActive     Boolean   @default(true)
   services     Service[]
@@ -16,9 +17,10 @@ model Service {
   stockQuantity        Int                    @default(0)
   categoryId           String                 @db.Uuid
   isActive             Boolean                @default(true)
+  imageUrl             String?
   inventoryLogs        InventoryLog[]
   invoiceItems         InvoiceService[]
-  purchase_order_items purchase_order_items[]
+  purchaseOrderItems   PurchaseOrderItem[]
   category             ServiceCategory        @relation(fields: [categoryId], references: [id])
 
   @@map("services")
@@ -39,7 +41,7 @@ model PurchaseOrder {
   id                   String                 @id @default(uuid(7)) @db.Uuid
   supplierId           String                 @db.Uuid
   staffId              String                 @db.Uuid
-  purchase_order_items purchase_order_items[]
+  purchaseOrderItems   PurchaseOrderItem[]
   staff                User                   @relation("StaffPurchaseOrders", fields: [staffId], references: [id])
   supplier             Supplier               @relation(fields: [supplierId], references: [id])
 

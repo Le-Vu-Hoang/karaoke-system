@@ -13,9 +13,7 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
 			//# P2002: Unique constraint failed (e.g., Email or Phone number already exists)
 			case 'P2002': {
 				const status = HttpStatus.CONFLICT;
-				const targetField = exception.meta?.target
-					? (exception.meta.target as string[]).join(', ')
-					: 'field';
+				const targetField = exception.meta?.target ? (exception.meta.target as string[]).join(', ') : 'field';
 
 				response.status(status).json({
 					statusCode: status,
@@ -40,9 +38,7 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
 			//# P2003: Foreign key constraint failed (e.g., creating a booking with an invalid room ID)
 			case 'P2003': {
 				const status = HttpStatus.BAD_REQUEST;
-				const targetField = exception.meta?.field_name
-					? (exception.meta.field_name as string)
-					: 'relation';
+				const targetField = exception.meta?.field_name ? (exception.meta.field_name as string) : 'relation';
 
 				response.status(status).json({
 					statusCode: status,

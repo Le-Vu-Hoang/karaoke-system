@@ -1,3 +1,5 @@
+name: ktv_local_services
+
 services:
   redis:
     image: redis:7-alpine
@@ -23,9 +25,32 @@ services:
       --maxmemory 256mb 
       --maxmemory-policy allkeys-lru
 
+  postgres:
+    image: postgres:17-alpine
+    container_name: ktv_postgres_data
+    ports:
+      - "5432:5432"
+    environment:
+
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "04092004"
+      POSTGRES_DB: ktv_local_db
+    volumes:
+      - postgres_local_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - ktv-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d ktv_local_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
 networks:
   ktv-network:
     driver: bridge
 
 volumes:
   redis_local_data:
+  postgres_local_data:

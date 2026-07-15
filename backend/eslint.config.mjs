@@ -31,7 +31,27 @@ export default tseslint.config(
 			'@typescript-eslint/no-unsafe-argument': 'warn',
 			'@typescript-eslint/no-unused-vars': 'warn',
 			'@typescript-eslint/no-unsafe-assignment': 'off',
-			'prettier/prettier': ['error', { endOfLine: 'auto' }],
+
+			'max-len': [
+				'error',
+				{
+					code: 120,
+					tabWidth: 2,
+					ignoreUrls: true,
+					ignoreComments: true,
+					ignoreStrings: true,
+					ignoreTemplateLiterals: true,
+					ignoreRegExpLiterals: true,
+				},
+			],
+
+			'prettier/prettier': [
+				'error',
+				{
+					endOfLine: 'auto',
+					printWidth: 120,
+				},
+			],
 		},
 	},
 );

@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -18,6 +16,9 @@ import { InvoiceModule } from './modules/invoice/invoice.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { RedisModule } from './modules/redis/redis.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { APP_GUARD } from '@nestjs/core';
+import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 
 @Module({
 	imports: [
@@ -33,6 +34,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 				REDIS_HOST: Joi.string().default('localhost'),
 				REDIS_PORT: Joi.number().default(4924),
 				REDIS_PASSWORD: Joi.string().allow('').optional(),
+				CLOUDINARY_CLOUD_NAME: Joi.string().required(),
+				CLOUDINARY_API_KEY: Joi.string().required(),
+				CLOUDINARY_API_SECRET: Joi.string().required(),
 			}),
 		}),
 		ScheduleModule.forRoot(),
@@ -67,8 +71,14 @@ import { ScheduleModule } from '@nestjs/schedule';
 		ServicesModule,
 		ShiftModule,
 		RedisModule,
+		CloudinaryModule,
 	],
-	controllers: [AppController],
-	providers: [AppService, JwtStrategy],
+	providers: [
+		JwtStrategy,
+		{
+			provide: APP_GUARD,
+			useClass: JwtAuthGuard,
+		},
+	],
 })
 export class AppModule {}

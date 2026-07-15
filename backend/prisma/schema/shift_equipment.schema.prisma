@@ -13,10 +13,10 @@ model Shift {
 }
 
 model Equipment {
+  id           String           @id @default(uuid(7)) @db.Uuid
   name         String
   serialNumber String?          @unique
   status       EquipmentStatus  @default(ACTIVE)
-  id           String           @id @default(uuid(7)) @db.Uuid
   roomId       String           @db.Uuid
   room         Room             @relation(fields: [roomId], references: [id])
   maintenances MaintenanceLog[]

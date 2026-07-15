@@ -4,9 +4,12 @@ import { ClassSerializerInterceptor, Logger, ValidationPipe } from '@nestjs/comm
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { PrismaClientExceptionFilter } from './common/filters/prisma-client-exception.filter';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, { rawBody: true });
+
+	app.use(cookieParser());
 
 	app.setGlobalPrefix('/api/v1');
 
@@ -34,7 +37,7 @@ async function bootstrap() {
 				name: 'JWT',
 				description: 'Enter JWT token to access protected endpoints',
 			},
-			'JWT-auth',
+			'JWT',
 		)
 		.addServer('http://localhost:3001', 'Development server')
 		.build();

@@ -3,6 +3,7 @@ model RoomType {
   capacity         Int
   basePricePerHour Decimal     @db.Decimal(10, 2)
   description      String?
+  imageUrl         String?
   id               String      @id @default(uuid(7)) @db.Uuid
   bookings         Booking[]
   priceRules       PriceRule[]
@@ -16,7 +17,8 @@ model Room {
   status     RoomStatus  @default(AVAILABLE)
   id         String      @id @default(uuid(7)) @db.Uuid
   roomTypeId String      @db.Uuid
-  is_deleted Boolean     @default(false)
+  isDeleted  Boolean     @default(false) @map("is_deleted")
+  imageUrl   String?
   bookings   Booking[]
   equipments Equipment[]
   invoices   Invoice[]

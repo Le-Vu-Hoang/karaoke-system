@@ -1,11 +1,13 @@
-model purchase_order_items {
+model PurchaseOrderItem {
   id              String        @id @default(uuid(7)) @db.Uuid
   purchaseOrderId String        @db.Uuid
   serviceId       String        @db.Uuid
   quantity        Int
   unitPrice       Decimal       @db.Decimal(10, 2)
-  purchase_orders PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
-  services        Service       @relation(fields: [serviceId], references: [id])
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  service         Service       @relation(fields: [serviceId], references: [id])
+
+  @@map("purchase_order_items")
 }
 
 enum ShiftStatus {

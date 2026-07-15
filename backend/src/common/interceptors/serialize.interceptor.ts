@@ -13,12 +13,7 @@ export class SerializeInterceptor implements NestInterceptor {
 	intercept(context: ExecutionContext, handler: CallHandler): Observable<unknown> {
 		return handler.handle().pipe(
 			map((response: unknown) => {
-				if (
-					response !== null &&
-					typeof response === 'object' &&
-					'data' in response &&
-					'meta' in response
-				) {
+				if (response !== null && typeof response === 'object' && 'data' in response && 'meta' in response) {
 					const paginatedResponse = response as { data: unknown[]; meta: unknown };
 
 					return {

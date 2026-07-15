@@ -1,63 +1,3 @@
-model Booking {
-  guestName        String?
-  guestPhone       String?
-  bookingTime      DateTime
-  durationExpected Int
-  status           BookingStatus @default(PENDING)
-  deposit          Decimal?      @default(0) @db.Decimal(10, 2)
-  createdAt        DateTime      @default(now())
-  id               String        @id @default(uuid(7)) @db.Uuid
-  customerId       String?       @db.Uuid
-  roomTypeId       String        @db.Uuid
-  roomId           String?       @db.Uuid
-  customer         User?         @relation("CustomerBookings", fields: [customerId], references: [id])
-  room             Room?         @relation(fields: [roomId], references: [id])
-  roomType         RoomType      @relation(fields: [roomTypeId], references: [id])
-  invoices         Invoice[]
-  payments         Payment[]
-
-  @@index([bookingTime])
-  @@map("bookings")
-}
-
-model Invoice {
-  startTime     DateTime         @default(now())
-  endTime       DateTime?
-  roomTotal     Decimal          @default(0) @db.Decimal(10, 2)
-  servicesTotal Decimal          @default(0) @db.Decimal(10, 2)
-  discount      Decimal          @default(0) @db.Decimal(10, 2)
-  finalTotal    Decimal          @default(0) @db.Decimal(10, 2)
-  status        InvoiceStatus    @default(UNPAID)
-  id            String           @id @default(uuid(7)) @db.Uuid
-  bookingId     String?          @db.Uuid
-  roomId        String           @db.Uuid
-  staffId       String           @db.Uuid
-  createdAt     DateTime         @default(now())
-  is_deleted    Boolean          @default(false)
-  reason        String?
-  invoiceItems  InvoiceService[]
-  booking       Booking?         @relation(fields: [bookingId], references: [id])
-  room          Room             @relation(fields: [roomId], references: [id])
-  staff         User             @relation("StaffInvoices", fields: [staffId], references: [id])
-  payments      Payment[]
-
-  @@index([startTime, endTime])
-  @@map("invoices")
-}
-
-model InvoiceService {
-  quantity    Int
-  priceAtTime Decimal  @db.Decimal(10, 2)
-  orderTime   DateTime @default(now())
-  id          String   @id @default(uuid(7)) @db.Uuid
-  invoiceId   String   @db.Uuid
-  serviceId   String   @db.Uuid
-  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  service     Service  @relation(fields: [serviceId], references: [id])
-
-  @@map("invoice_services")
-}
-
 enum BookingStatus {
   PENDING
   CONFIRMED
@@ -69,3 +9,116 @@ enum InvoiceStatus {
   UNPAID
   PAID
 }
+
+model Booking {
+  id String @id @default(uuid(7)) @db.Uuid
+
+  // Thông tin khách hàng đặt lịch
+  customerId String? @db.Uuid
+  customer   User?   @relation("CustomerBookings", fields: [customerId], references: [id])
+  guestName  String? @db.VarChar(100)
+  guestPhone String? @db.VarChar(20)
+
+  // Thông tin phòng và loại phòng
+  roomId     String? @db.Uuid
+  roomTypeId String  @db.Uuid
+
+  // Thời gian đặt phòng
+  startTime DateTime @db.Timestamp(3)
+  endTime   DateTime @db.Timestamp(3)
+
+  // Trạng thái đặt phòng và thông tin thanh toán
+  status  BookingStatus @default(PENDING)
+  deposit Decimal?      @default(0) @db.Decimal(10, 2)
+  notes   String?       @db.Text
+
+  // Thời gian check-in và check-out
+  checkedInAt  DateTime? @db.Timestamp(3)
+  checkedOutAt DateTime? @db.Timestamp(3)
+
+  // Thời gian tạo và cập nhật bản ghi
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  updatedAt DateTime @updatedAt @db.Timestamp(3)
+
+  paymentProvider   String? @db.VarChar(50)
+  // Mã tham chiếu giao dịch dùng chung cho tất cả các cổng (Unique)
+  // - Với Stripe: Là PaymentIntent ID (pi_xxxxxx)
+  // - Với VNPay: Là vnp_TxnRef sinh ra từ hệ thống của bạn
+  // - Với MoMo: Là orderId của đơn thanh toán
+  paymentSessionRef String? @unique @db.VarChar(255)
+
+  roomType RoomType  @relation(fields: [roomTypeId], references: [id])
+  room     Room?     @relation(fields: [roomId], references: [id])
+  invoices Invoice[]
+  payments Payment[]
+
+  @@index([roomTypeId, status, startTime, endTime])
+  @@index([createdAt])
+  @@map("bookings")
+}
+
+model Invoice {
+  id        String  @id @default(uuid(7)) @db.Uuid
+  bookingId String? @db.Uuid
+  roomId    String  @db.Uuid
+  staffId   String  @db.Uuid
+
+  // Thời gian thực thi phiên hát của phòng
+  startTime DateTime  @default(now()) @db.Timestamp(3)
+  endTime   DateTime? @db.Timestamp(3)
+
+  // Quản lý dòng tiền số liệu tài chính
+  roomTotal     Decimal       @default(0) @db.Decimal(10, 2)
+  servicesTotal Decimal       @default(0) @db.Decimal(10, 2)
+  discount      Decimal       @default(0) @db.Decimal(10, 2)
+  finalTotal    Decimal       @default(0) @db.Decimal(10, 2)
+  status        InvoiceStatus @default(UNPAID)
+
+  // Phục vụ cơ chế xóa mềm hóa đơn (Đã đồng bộ sang camelCase)
+  isDeleted Boolean @default(false) @map("is_deleted")
+  reason    String? @db.Text
+
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+
+  // Khai báo các mối quan hệ liên kết bảng
+  invoiceItems InvoiceService[]
+  booking      Booking?         @relation(fields: [bookingId], references: [id])
+  room         Room             @relation(fields: [roomId], references: [id])
+  staff        User             @relation("StaffInvoices", fields: [staffId], references: [id])
+  payments     Payment[]
+
+  @@index([startTime, endTime])
+  @@map("invoices")
+}
+
+model InvoiceService {
+  id        String @id @default(uuid(7)) @db.Uuid
+  invoiceId String @db.Uuid
+  serviceId String @db.Uuid
+
+  quantity    Int
+  priceAtTime Decimal  @db.Decimal(10, 2) // Giữ nguyên trường này để lưu giá thời điểm gọi món (Rất chuẩn!)
+  orderTime   DateTime @default(now()) @db.Timestamp(3)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [serviceId], references: [id])
+
+  @@map("invoice_services")
+}
+
+// ```
+//
+// ### 💡 Mẹo truy vấn nâng cao với thiết kế này:
+//
+// Với cấu trúc hóa đơn này, để Frontend Next.js vẽ được **Sơ đồ phòng hát thời gian thực (Dashboard sơ đồ phòng trực quan)**, bạn không cần phải cập nhật trạng thái phòng vật lý liên tục qua bảng `Room`. Bạn chỉ cần thực hiện câu lệnh query cực kỳ tinh gọn này ở `RoomService`:
+//
+// ```typescript
+// // Tìm tất cả các phòng đang có khách hát thực tế tại thời điểm hiện tại
+// const activeRooms = await this.prisma.invoice.findMany({
+// where: {
+// endTime: null,
+// status: 'UNPAID',
+// isDeleted: false
+// },
+// select: { roomId: true, startTime: true, booking: { select: { guestName: true } } }
+// });
