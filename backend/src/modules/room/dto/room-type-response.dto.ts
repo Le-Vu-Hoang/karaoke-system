@@ -1,4 +1,4 @@
-import { Expose, Transform } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 
 /**
  * Data Transfer Object cho dữ liệu phản hồi của một loại phòng.
@@ -35,9 +35,8 @@ export class RoomTypeResponseDto {
 	 * @example 150000.0
 	 */
 	@Expose()
-	@Transform(({ value }) =>
-		value && typeof value.toNumber === 'function' ? value.toNumber() : Number(value) || 0,
-	)
+	@Type(() => Number)
+	@Transform(({ value }) => (value && typeof value.toNumber === 'function' ? value.toNumber() : Number(value) || 0))
 	basePricePerHour: number;
 
 	/**
@@ -47,4 +46,12 @@ export class RoomTypeResponseDto {
 	 */
 	@Expose()
 	description: string | null;
+
+	/**
+	 * URL hình ảnh của loại phòng.
+	 *
+	 * @example https://res.cloudinary.com/...image.jpg
+	 */
+	@Expose()
+	imageUrl?: string | null;
 }

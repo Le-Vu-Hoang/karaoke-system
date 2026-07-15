@@ -88,17 +88,12 @@ export class EquipmentService {
 			throw new NotFoundException(`Equipment not found with ID: ${id}`);
 		}
 
-		if (
-			updateEquipmentDto.serialNumber &&
-			updateEquipmentDto.serialNumber !== equipment.serialNumber
-		) {
+		if (updateEquipmentDto.serialNumber && updateEquipmentDto.serialNumber !== equipment.serialNumber) {
 			const existingSerial = await this.prisma.equipment.findUnique({
 				where: { serialNumber: updateEquipmentDto.serialNumber },
 			});
 			if (existingSerial) {
-				throw new ConflictException(
-					`Serial number ${updateEquipmentDto.serialNumber} already exists!`,
-				);
+				throw new ConflictException(`Serial number ${updateEquipmentDto.serialNumber} already exists!`);
 			}
 		}
 
@@ -143,9 +138,7 @@ export class EquipmentService {
 				equipmentId,
 				description: createLogDto.description,
 				cost: createLogDto.cost,
-				maintenanceDate: createLogDto.maintenanceDate
-					? new Date(createLogDto.maintenanceDate)
-					: new Date(),
+				maintenanceDate: createLogDto.maintenanceDate ? new Date(createLogDto.maintenanceDate) : new Date(),
 			},
 		});
 	}

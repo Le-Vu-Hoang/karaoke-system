@@ -39,6 +39,14 @@ export class RoomResponseDto {
 	status: RoomStatus;
 
 	/**
+	 * URL hình ảnh của phòng.
+	 *
+	 * @example https://res.cloudinary.com/...image.jpg
+	 */
+	@Expose()
+	imageUrl?: string | null;
+
+	/**
 	 * Thông tin chi tiết loại phòng đi kèm (Nếu được join query).
 	 */
 	@Expose()

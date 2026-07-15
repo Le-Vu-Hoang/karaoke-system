@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsUUID, IsEnum, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, IsUUID, IsEnum, IsOptional, IsUrl } from 'class-validator';
 import { Expose } from 'class-transformer';
 import { RoomStatus } from '@prisma/client';
 
@@ -6,6 +6,17 @@ import { RoomStatus } from '@prisma/client';
  * Data Transfer Object cho việc tạo mới một phòng vật lý.
  */
 export class CreateRoomDto {
+	/**
+	 * URL hình ảnh của phòng.
+	 *
+	 * @example https://res.cloudinary.com/...image.jpg
+	 */
+	@Expose()
+	@IsString()
+	@IsUrl({}, { message: 'Đường dẫn ảnh không hợp lệ' })
+	@IsOptional()
+	imageUrl?: string;
+
 	/**
 	 * ID của loại phòng liên kết (UUIDv7).
 	 *

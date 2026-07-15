@@ -34,6 +34,7 @@ export class RoomService {
 					name: true,
 					capacity: true,
 					description: true,
+					imageUrl: true,
 					basePricePerHour: true,
 				},
 			}),
@@ -105,9 +106,7 @@ export class RoomService {
 				}
 
 				if (error.code === 'P2003') {
-					throw new ConflictException(
-						'Cannot delete/create because the data is currently in use or referenced!',
-					);
+					throw new ConflictException('Cannot delete/create because the data is currently in use or referenced!');
 				}
 			}
 
@@ -127,7 +126,7 @@ export class RoomService {
 				skip,
 				take,
 				where: {
-					is_deleted: false,
+					isDeleted: false,
 				},
 				orderBy: { roomNumber: 'asc' },
 				include: {
@@ -136,7 +135,7 @@ export class RoomService {
 			}),
 			this.prisma.room.count({
 				where: {
-					is_deleted: false,
+					isDeleted: false,
 				},
 			}),
 		]);
@@ -204,9 +203,7 @@ export class RoomService {
 		} catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {
 				if (error.code === 'P2002') {
-					throw new ConflictException(
-						`Room number "${dto.roomNumber}" already exists. Please choose another one!`,
-					);
+					throw new ConflictException(`Room number "${dto.roomNumber}" already exists. Please choose another one!`);
 				}
 			}
 			throw error;
@@ -248,7 +245,7 @@ export class RoomService {
 		await this.prisma.room.update({
 			where: { id },
 			data: {
-				is_deleted: true,
+				isDeleted: true,
 			},
 		});
 

@@ -1,14 +1,4 @@
-import {
-	Body,
-	Controller,
-	Delete,
-	Get,
-	Param,
-	Patch,
-	Post,
-	Query,
-	UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import {
 	ApiBadRequestResponse,
 	ApiBearerAuth,
@@ -19,7 +9,6 @@ import {
 	ApiResponse,
 	ApiTags,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RoleGuard } from '../../common/guards/role.guard';
 import { RoomService } from './room.service';
 import { Roles } from '../../common/decorations/role.decorator';
@@ -41,7 +30,7 @@ import { Serialize } from '../../common/interceptors/serialize.interceptor';
 @ApiTags('Rooms')
 @ApiBearerAuth('JWT')
 @Controller('rooms')
-@UseGuards(JwtAuthGuard, RoleGuard)
+@UseGuards(RoleGuard)
 export class RoomController {
 	constructor(private readonly roomService: RoomService) {}
 

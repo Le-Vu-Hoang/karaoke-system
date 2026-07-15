@@ -1,10 +1,21 @@
-import { IsNotEmpty, IsString, IsInt, IsNumber, IsOptional, Min } from 'class-validator';
+import { IsNotEmpty, IsString, IsInt, IsNumber, IsOptional, Min, IsUrl } from 'class-validator';
 import { Expose } from 'class-transformer';
 
 /**
  * Data Transfer Object cho việc tạo mới loại phòng.
  */
 export class CreateRoomTypeDto {
+	/**
+	 * URL hình ảnh của loại phòng.
+	 *
+	 * @example https://res.cloudinary.com/...image.jpg
+	 */
+	@Expose()
+	@IsString()
+	@IsUrl({}, { message: 'Đường dẫn ảnh không hợp lệ' })
+	@IsOptional()
+	imageUrl?: string;
+
 	/**
 	 * Tên loại phòng (VD: Phòng VIP, Phòng Standard).
 	 *
