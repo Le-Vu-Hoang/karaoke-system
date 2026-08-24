@@ -4,31 +4,31 @@ import { Expose, Transform } from 'class-transformer';
 import { EquipmentStatus } from '@prisma/client';
 
 export class EquipmentQueryDto {
-	/**
-	 * Tìm kiếm theo tên hoặc số Serial
-	 */
-	@ApiPropertyOptional({ description: 'Tìm kiếm theo tên hoặc số Serial' })
-	@Expose()
-	@Transform(({ value }): string => (typeof value === 'string' ? value.trim() : value))
-	@IsString()
-	@IsOptional()
-	search?: string;
+  /**
+   * Tìm kiếm theo tên hoặc số Serial.
+   * @example "Micro"
+   */
+  @Expose()
+  @Transform(({ value }): string => (typeof value === 'string' ? value.trim() : value))
+  @IsString()
+  @IsOptional()
+  search?: string;
 
-	/**
-	 * ID của phòng chứa thiết bị
-	 */
-	@ApiPropertyOptional({ description: 'Lọc theo ID phòng' })
-	@Expose()
-	@IsUUID()
-	@IsOptional()
-	roomId?: string;
+  /**
+   * ID của phòng chứa thiết bị.
+   * @example "123e4567-e89b-12d3-a456-426614174000"
+   */
+  @Expose()
+  @IsUUID()
+  @IsOptional()
+  roomId?: string;
 
-	/**
-	 * Trạng thái thiết bị
-	 */
-	@ApiPropertyOptional({ enum: EquipmentStatus, description: 'Lọc theo trạng thái thiết bị' })
-	@Expose()
-	@IsEnum(EquipmentStatus)
-	@IsOptional()
-	status?: EquipmentStatus;
+  /**
+   * Trạng thái thiết bị.
+   * @example "ACTIVE"
+   */
+  @Expose()
+  @IsEnum(EquipmentStatus)
+  @IsOptional()
+  status?: EquipmentStatus;
 }

@@ -6,9 +6,9 @@ import { PricingModule } from '../pricing/pricing.module';
 import { BookingCronService } from './booking-cron.service';
 
 @Module({
-	imports: [PrismaModule, PricingModule],
-	controllers: [BookingController],
-	providers: [BookingService, BookingCronService],
-	exports: [BookingService],
+  imports: [PrismaModule, PricingModule],
+  controllers: [BookingController],
+  providers: [BookingService, BookingCronService],
+  exports: [BookingService],
 })
 export class BookingModule {}

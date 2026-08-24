@@ -8,8 +8,8 @@ import { PurchaseOrderService } from './services/purchase-order/purchase-order.s
 import { InventoryLogService } from './services/inventory-log/inventory-log.service';
 
 @Module({
-	imports: [PrismaModule],
-	controllers: [SupplierController, PurchaseOrderController, InventoryLogController],
-	providers: [SupplierService, PurchaseOrderService, InventoryLogService],
+  imports: [PrismaModule],
+  controllers: [SupplierController, PurchaseOrderController, InventoryLogController],
+  providers: [SupplierService, PurchaseOrderService, InventoryLogService],
 })
 export class InventoryModule {}

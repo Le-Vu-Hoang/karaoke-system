@@ -4,23 +4,23 @@ import { QueryInventoryLogDto } from '../../dto/inventory-log/query-inventory-lo
 
 @Injectable()
 export class InventoryLogService {
-	constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-	async findAll(query: QueryInventoryLogDto) {
-		const { serviceId, changeType } = query;
+  async findAll(query: QueryInventoryLogDto) {
+    const { serviceId, changeType } = query;
 
-		const where: any = {};
-		if (serviceId) where.serviceId = serviceId;
-		if (changeType) where.changeType = changeType;
+    const where: any = {};
+    if (serviceId) where.serviceId = serviceId;
+    if (changeType) where.changeType = changeType;
 
-		return this.prisma.inventoryLog.findMany({
-			where,
-			include: {
-				service: {
-					include: { category: true },
-				},
-			},
-			orderBy: { createdAt: 'desc' },
-		});
-	}
+    return this.prisma.inventoryLog.findMany({
+      where,
+      include: {
+        service: {
+          include: { category: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
 }

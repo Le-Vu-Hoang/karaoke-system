@@ -1,73 +1,33 @@
 ---
 name: stripe-best-practices
 description: >-
-  Guides Stripe integration decisions across API selection (Checkout Sessions vs
-  PaymentIntents), Connect platform setup (Accounts v2, controller properties),
-  billing/subscriptions, tax and registrations (Stripe Tax, automatic_tax,
-  product tax codes), Treasury financial accounts, integration options
-  (Checkout, Payment Element), migrating from deprecated Stripe APIs, and
-  security best practices (API key management, restricted keys, webhooks,
-  OAuth). Use when building, modifying, or reviewing any Stripe integration,
-  including accepting payments, building marketplaces, integrating Stripe,
-  processing payments, setting up subscriptions, collecting sales tax, VAT, or
-  GST, creating connected accounts, or implementing secure key handling.
-
+  Guidelines for working with the Stripe payment integration in this project. Use when modifying or reviewing the StripeStrategy, payment webhooks, or CQRS payment handlers.
 ---
 
-Latest Stripe API version: **2026-07-29.dahlia**. Always use the latest API version and SDK unless the user specifies otherwise.
+# Stripe Integration Guidelines (Tailored for first-p-nestjs)
 
-Latest SDK versions:
+This project implements Stripe as part of a multi-gateway **Strategy Pattern** (alongside Momo and VNPay) managed via **CQRS**.
 
-| Language | Latest version |
-| --- | --- |
-| Ruby | 19.4.0 |
-| Python | 15.4.0 |
-| Node.js | 22.4.0 |
-| PHP | 21.1.0 |
-| Java | 33.2.0 |
-| Go | 86.2.0 |
-| .NET | 52.2.0 |
+## 1. Architecture & Strategy Pattern
+- **Payment Strategy**: The Stripe implementation MUST adhere to the `PaymentStrategy` interface (`src/modules/payment/interface/payment-strategy.interface.ts`).
+- **CQRS Handlers**: Payment flows are decoupled. Payments are initiated via `CreatePaymentIntentHandler` and webhooks are processed by `ProcessPaymentWebhookHandler`.
+- **Configuration**: Stripe configuration is injected dynamically via `PaymentModule.forRootAsync`.
 
-If you don’t have a Stripe account, you can call a CLI command to generate working API keys with no registration required. You can install the Stripe CLI (`npm i -g @stripe/cli`) and run the command `stripe sandbox create` to get started.
+## 2. PaymentIntents API (Required)
+- While general Stripe guides often recommend "Checkout Sessions", **this project explicitly uses PaymentIntents** to support custom UI and the unified `PaymentStrategy` interface.
+- `createPaymentIntent(amount, currency, metadata)` must use `stripe.paymentIntents.create({...})`.
+- **CRITICAL RULE**: **Never include `payment_method_types`** when creating a PaymentIntent. Omit this parameter entirely. This enables dynamic payment methods, allowing the project owner to toggle payment methods (Cards, Wallets, etc.) directly from the Stripe Dashboard without changing code.
 
-If `stripe sandbox create` is used, don’t use MCP.
+## 3. Webhook Handling & Security
+- **Raw Body Required**: Stripe webhook signature verification (`verifyWebhook`) requires the **raw, unparsed body** (Buffer). Ensure the Nest.js webhook controller uses `@Req() req: RawBodyRequest<Request>` or proper raw body parsing. If validation fails with `SignatureVerificationError`, throw a standard NestJS `BadRequestException`.
+- **Idempotency**: Webhook event processing (e.g., `PaymentSucceededHandler`) MUST be idempotent. Always check if the `transactionId` was already marked as paid in the database before updating records or triggering side-effects.
+- **Target Events**: Primarily handle `payment_intent.succeeded` and `payment_intent.payment_failed`.
 
-If you try to use MCP after running sandbox creation, first make sure `stripe sandbox claim` is run. Use `stripe whoami --format json` for CLI auth checks; do not run `stripe config --list`.
+## 4. API Version & Best Practices
+- **Client Instantiation**: Always instantiate a specific `Stripe` client instance inside the strategy: `new Stripe(secretKey, { apiVersion: '2024-06-20' })`.
+- **API Keys**: In documentation or env examples, always recommend [Restricted API Keys (RAK)](https://docs.stripe.com/keys/restricted-api-keys.md) (`rk_...`) over full Secret Keys (`sk_...`) for security.
 
-API key default: Always recommend a [restricted API key (RAK)](https://docs.stripe.com/keys/restricted-api-keys.md) (`rk_` prefix) over a secret key (`sk_` prefix).
-
-## Integration routing
-
-| Building… | Recommended API | Details |
-| --- | --- | --- |
-| One-time payments | Checkout Sessions | <references/payments.md> |
-| Custom payment form with embedded UI | Checkout Sessions + Payment Element | <references/payments.md> |
-| Saving a payment method for later | Setup Intents | <references/payments.md> |
-| Connect platform or marketplace | Accounts v2 (`/v2/core/accounts`) | <references/connect.md> |
-| Usage-based billing (new integration) | Metronome | <references/billing.md> |
-| Subscriptions or recurring billing | Billing APIs + Checkout Sessions | <references/billing.md> |
-| Sales tax, VAT, or GST compliance | Stripe Tax + Registrations API | <references/tax.md> |
-| Embedded financial accounts / banking | v2 Financial Accounts | <references/treasury.md> |
-| Security (key management, RAKs, webhooks, OAuth, 2FA, Connect liability) | See security reference | <references/security.md> |
-
-Read the relevant reference file before answering any integration question or writing code.
-
-## Critical rules
-
-- *Before enabling `automatic_tax: { enabled: true }`* (or calculating tax for a custom PaymentIntent), read the [tax reference](references/tax.md) and confirm the user has an active registration. Without one, Stripe calculates and collects no tax while the user believes tax is on (the most common Stripe Tax mistake).
-
-- *Never include `payment_method_types` in any Stripe API call*, with one exception: Terminal (in-person payments) integrations must pass `payment_method_types: ['card_present']` on the PaymentIntent. For all other integrations, omit this parameter entirely to enable dynamic payment methods, which enables you to configure payment method settings from the Dashboard and dynamically display the most relevant eligible payment methods to each customer to maximize conversion. To customize which payment methods you accept, use [`payment_method_configurations`](https://docs.stripe.com/payments/payment-method-configurations.md) or `excluded_payment_method_types` instead of `payment_method_types`.
-
-- *Never present webhooks as optional.* We recommend webhooks for every payment integration and they’re required for subscriptions and asynchronous payment methods. Fulfillment belongs in a handler for both `checkout.session.completed` and `checkout.session.async_payment_succeeded` (gated on `payment_status`), not the success page. See <references/payments.md>.
-
-- On API version `2026-03-25.dahlia` or later, pass the parameter `integration_identifier` to `checkout.sessions.create` to tag sessions with a custom label for tracking and comparing checkout flows in the Dashboard. The label should include a suffix of 8 random letters.
-
-- *Always instantiate a `StripeClient` and call methods on that instance.* Do **not** use the deprecated global/module-level API key pattern (`stripe.api_key = …`, `Stripe.setApiKey`, `stripe.Key = …`, `StripeConfiguration.ApiKey = …`). The global pattern is deprecated in all current SDKs.
-
-## Key documentation
-
-When the user’s request does not clearly fit a single domain above, consult:
-
-- [Integration Options](https://docs.stripe.com/payments/payment-methods/integration-options.md) — Start here when designing any integration.
-- [API Tour](https://docs.stripe.com/payments-api/tour.md) — Overview of Stripe’s API surface.
-- [Go Live Checklist](https://docs.stripe.com/get-started/checklist/go-live.md) — Review before launching.
+## Code Constraints for StripeStrategy
+When editing `src/modules/payment/strategies/stripe.strategy.ts`:
+- Ensure the `PaymentIntentResult` accurately maps Stripe's `id` to `transactionId` and includes the `clientSecret`.
+- Ensure metadata passed into `createPaymentIntent` includes necessary identifiers (like `bookingId` or `userId`) to reconcile the payment inside the webhook handler.

@@ -1,17 +1,3 @@
-model Voucher {
-  code             String       @unique
-  discountType     DiscountType
-  discountValue    Decimal      @db.Decimal(10, 2)
-  minInvoiceAmount Decimal      @db.Decimal(10, 2)
-  validFrom        DateTime
-  validUntil       DateTime
-  usageLimit       Int?
-  id               String       @id @default(uuid(7)) @db.Uuid
-  usedCount        Int          @default(0)
-
-  @@map("vouchers")
-}
-
 model Payment {
   amount          Decimal       @db.Decimal(10, 2)
   paymentMethod   PaymentMethod
@@ -24,11 +10,6 @@ model Payment {
   invoice         Invoice?      @relation(fields: [invoiceId], references: [id])
 
   @@map("payments")
-}
-
-enum DiscountType {
-  PERCENT
-  FIXED_AMOUNT
 }
 
 enum PaymentMethod {

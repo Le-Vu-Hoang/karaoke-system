@@ -1,43 +1,94 @@
-import { Expose, Type } from 'class-transformer';
+import { Expose, Type, Transform } from 'class-transformer';
 import { ShiftStatus } from '@prisma/client';
 
 class UserSummaryDto {
-	@Expose()
-	id: string;
+  /**
+   * ID của nhân viên.
+   * @example "staff-123"
+   */
+  @Expose()
+  id: string;
 
-	@Expose()
-	fullName: string;
+  /**
+   * Tên nhân viên.
+   * @example "Nguyen Van A"
+   */
+  @Expose()
+  fullName: string;
 }
 
 /**
  * Data Transfer Object cho phản hồi chi tiết ca làm việc.
  */
 export class ShiftResponseDto {
-	@Expose()
-	id: string;
+  /**
+   * ID của ca làm việc (UUID).
+   * @example "shift-456"
+   */
+  @Expose()
+  id: string;
 
-	@Expose()
-	staffId: string;
+  /**
+   * ID của nhân viên nhận ca.
+   * @example "staff-123"
+   */
+  @Expose()
+  staffId: string;
 
-	@Expose()
-	startTime: Date;
+  /**
+   * Thời gian bắt đầu ca.
+   * @example "2026-08-21T07:00:00Z"
+   */
+  @Expose()
+  startTime: Date;
 
-	@Expose()
-	endTime: Date | null;
+  /**
+   * Thời gian kết thúc ca (nếu đã đóng).
+   * @example "2026-08-21T15:00:00Z"
+   */
+  @Expose()
+  endTime: Date | null;
 
-	@Expose()
-	status: ShiftStatus;
+  /**
+   * Trạng thái ca làm việc (OPEN/CLOSED).
+   * @example "OPEN"
+   */
+  @Expose()
+  status: ShiftStatus;
 
-	@Expose()
-	startingCash: number;
+  /**
+   * Số tiền mặt ban đầu trong két.
+   * @example 2000000
+   */
+  @Expose()
+  @Type(() => Number)
+  @Transform(({ value }: { value: any }): number =>
+    value && typeof value?.toNumber === 'function' ? Number(value.toNumber()) : Number(value) || 0,
+  )
+  startingCash: number;
 
-	@Expose()
-	endingCash: number | null;
+  /**
+   * Số tiền mặt thực tế khi đóng ca.
+   * @example null
+   */
+  @Expose()
+  @Type(() => Number)
+  @Transform(({ value }) => (value && typeof value.toNumber === 'function' ? value.toNumber() : Number(value) || null))
+  endingCash: number | null;
 
-	@Expose()
-	expectedCash: number | null;
+  /**
+   * Số tiền mặt dự kiến (Tiền ban đầu + Doanh thu mặt).
+   * @example null
+   */
+  @Expose()
+  @Type(() => Number)
+  @Transform(({ value }) => (value && typeof value.toNumber === 'function' ? value.toNumber() : Number(value) || null))
+  expectedCash: number | null;
 
-	@Expose()
-	@Type(() => UserSummaryDto)
-	staff: UserSummaryDto;
+  /**
+   * Thông tin tóm tắt của nhân viên.
+   */
+  @Expose()
+  @Type(() => UserSummaryDto)
+  staff: UserSummaryDto;
 }

@@ -1,10 +1,11 @@
 model RoomType {
+  id               String      @id @default(uuid(7)) @db.Uuid
   name             String      @unique
   capacity         Int
   basePricePerHour Decimal     @db.Decimal(10, 2)
   description      String?
   imageUrl         String?
-  id               String      @id @default(uuid(7)) @db.Uuid
+  tags             String[]    @default([])
   bookings         Booking[]
   priceRules       PriceRule[]
   rooms            Room[]

@@ -27,13 +27,14 @@ export class BookingCronService {
 
     if (expiredBookings.length > 0) {
       const expiredIds = expiredBookings.map((b) => b.id);
-      
+
       const { count } = await this.prisma.booking.updateMany({
         where: {
           id: { in: expiredIds },
         },
         data: {
           status: 'CANCELLED',
+          notes: 'AUTO_CANCEL_TIMEOUT',
         },
       });
 

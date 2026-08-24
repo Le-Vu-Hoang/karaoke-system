@@ -1,0 +1,72 @@
+model MembershipTier {
+  id              String  @id @default(uuid(7)) @db.Uuid
+  name            String  @unique // VD: "GOLD"
+  minSpent        Decimal @default(0) @db.Decimal(10, 2)
+  minPoints       Int     @default(0)
+  discountPercent Decimal @default(0) @db.Decimal(5, 2)
+
+  users User[]
+
+  @@map("membership_tiers")
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+enum VoucherScope {
+  ROOM_ONLY
+  SERVICE_ONLY
+  ALL
+}
+
+enum VoucherStatus {
+  UNUSED
+  USED
+  EXPIRED
+}
+
+model Voucher {
+  id          String  @id @default(uuid(7)) @db.Uuid
+  code        String  @unique // Mã voucher: LUNA50, VIP2026
+  title       String // Tiêu đề hiển thị
+  description String?
+
+  discountType  DiscountType @default(PERCENTAGE)
+  discountValue Decimal      @db.Decimal(10, 2)
+  maxDiscount   Decimal?     @db.Decimal(10, 2)
+  minOrderValue Decimal?     @db.Decimal(10, 2)
+
+  scope      VoucherScope @default(ROOM_ONLY)
+  pointsCost Int          @default(0)
+
+  validFrom DateTime @default(now())
+  validTo   DateTime
+  isActive  Boolean  @default(true)
+
+  userVouchers UserVoucher[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("vouchers")
+}
+
+model UserVoucher {
+  id        String  @id @default(uuid(7)) @db.Uuid
+  userId    String  @db.Uuid
+  voucherId String  @db.Uuid
+  invoiceId String? @db.Uuid
+
+  status VoucherStatus @default(UNUSED)
+  usedAt DateTime?
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  voucher Voucher  @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+  invoice Invoice? @relation(fields: [invoiceId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@map("user_vouchers")
+}

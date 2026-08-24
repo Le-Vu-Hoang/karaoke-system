@@ -3,20 +3,20 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { InventoryLogService } from '../../services/inventory-log/inventory-log.service';
 import { QueryInventoryLogDto } from '../../dto/inventory-log/query-inventory-log.dto';
 import { RoleGuard } from '../../../../common/guards/role.guard';
-import { Roles } from '../../../../common/decorations/role.decorator';
+import { AuthRoles } from '../../../../common/decorations/auth-roles.decorator';
 
 @ApiTags('Inventory Logs')
 @ApiBearerAuth()
 @UseGuards(RoleGuard)
-@Roles('ADMIN')
+@AuthRoles('ADMIN')
 @Controller('inventory/logs')
 export class InventoryLogController {
-	constructor(private readonly inventoryLogService: InventoryLogService) {}
+  constructor(private readonly inventoryLogService: InventoryLogService) {}
 
-	@Get()
-	@ApiOperation({ summary: 'Lấy danh sách lịch sử biến động kho' })
-	@ApiResponse({ status: 200, description: 'Thành công' })
-	findAll(@Query() query: QueryInventoryLogDto) {
-		return this.inventoryLogService.findAll(query);
-	}
+  @Get()
+  @ApiOperation({ summary: 'Lấy danh sách lịch sử biến động kho' })
+  @ApiResponse({ status: 200, description: 'Thành công' })
+  findAll(@Query() query: QueryInventoryLogDto) {
+    return this.inventoryLogService.findAll(query);
+  }
 }

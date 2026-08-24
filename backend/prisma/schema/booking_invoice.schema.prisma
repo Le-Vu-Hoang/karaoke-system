@@ -78,6 +78,14 @@ model Invoice {
   isDeleted Boolean @default(false) @map("is_deleted")
   reason    String? @db.Text
 
+  userId String? @db.Uuid
+  user   User?   @relation("CustomerInvoices", fields: [userId], references: [id])
+
+  appliedVouchers       UserVoucher[]
+  appliedVoucherCode    String?       @db.VarChar(50)
+  tierDiscountAmount    Decimal       @default(0) @db.Decimal(10, 2)
+  voucherDiscountAmount Decimal       @default(0) @db.Decimal(10, 2)
+
   createdAt DateTime @default(now()) @db.Timestamp(3)
 
   // Khai báo các mối quan hệ liên kết bảng

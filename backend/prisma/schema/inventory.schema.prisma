@@ -11,17 +11,17 @@ model ServiceCategory {
 }
 
 model Service {
-  id                   String                 @id @default(uuid(7)) @db.Uuid
-  name                 String
-  price                Decimal                @db.Decimal(10, 2)
-  stockQuantity        Int                    @default(0)
-  categoryId           String                 @db.Uuid
-  isActive             Boolean                @default(true)
-  imageUrl             String?
-  inventoryLogs        InventoryLog[]
-  invoiceItems         InvoiceService[]
-  purchaseOrderItems   PurchaseOrderItem[]
-  category             ServiceCategory        @relation(fields: [categoryId], references: [id])
+  id                 String              @id @default(uuid(7)) @db.Uuid
+  name               String
+  price              Decimal             @db.Decimal(10, 2)
+  stockQuantity      Int                 @default(0)
+  categoryId         String              @db.Uuid
+  isActive           Boolean             @default(true)
+  imageUrl           String?
+  inventoryLogs      InventoryLog[]
+  invoiceItems       InvoiceService[]
+  purchaseOrderItems PurchaseOrderItem[]
+  category           ServiceCategory     @relation(fields: [categoryId], references: [id])
 
   @@map("services")
 }
@@ -36,14 +36,14 @@ model Supplier {
 }
 
 model PurchaseOrder {
-  totalAmount          Decimal                @db.Decimal(10, 2)
-  orderDate            DateTime               @default(now())
-  id                   String                 @id @default(uuid(7)) @db.Uuid
-  supplierId           String                 @db.Uuid
-  staffId              String                 @db.Uuid
-  purchaseOrderItems   PurchaseOrderItem[]
-  staff                User                   @relation("StaffPurchaseOrders", fields: [staffId], references: [id])
-  supplier             Supplier               @relation(fields: [supplierId], references: [id])
+  totalAmount        Decimal             @db.Decimal(10, 2)
+  orderDate          DateTime            @default(now())
+  id                 String              @id @default(uuid(7)) @db.Uuid
+  supplierId         String              @db.Uuid
+  staffId            String              @db.Uuid
+  purchaseOrderItems PurchaseOrderItem[]
+  staff              User                @relation("StaffPurchaseOrders", fields: [staffId], references: [id])
+  supplier           Supplier            @relation(fields: [supplierId], references: [id])
 
   @@map("purchase_orders")
 }
