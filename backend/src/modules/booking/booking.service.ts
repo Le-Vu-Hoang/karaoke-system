@@ -23,8 +23,41 @@ export class BookingService {
     });
     if (!roomType) throw new NotFoundException('Room type not found.');
 
-    // Tính tiền cọc = Giá 1 giờ của phòng
     const startTime = new Date(createBookingDto.startTime);
+    const endTime = new Date(createBookingDto.endTime);
+
+    // Physical room assignment logic (Anti-fragmentation)
+    const availableRooms = await this.prisma.room.findMany({
+      where: {
+        roomTypeId: createBookingDto.roomTypeId,
+        isDeleted: false,
+        status: { not: 'MAINTENANCE' },
+      },
+    });
+
+    let assignedRoomId: string | null = null;
+
+    for (const room of availableRooms) {
+      const overlappingBooking = await this.prisma.booking.findFirst({
+        where: {
+          roomId: room.id,
+          status: { in: ['PENDING', 'CONFIRMED', 'ARRIVED'] },
+          startTime: { lt: endTime },
+          endTime: { gt: startTime },
+        },
+      });
+
+      if (!overlappingBooking) {
+        assignedRoomId = room.id;
+        break;
+      }
+    }
+
+    if (!assignedRoomId) {
+      throw new BadRequestException('Không có phòng nào trống xuyên suốt khung giờ bạn chọn!');
+    }
+
+    // Tính tiền cọc = Giá 1 giờ của phòng
     const oneHourLater = new Date(startTime.getTime() + 60 * 60 * 1000);
 
     const priceResult = await this.pricingService.calculatePrice({
@@ -43,10 +76,12 @@ export class BookingService {
         guestName: createBookingDto.guestName || null,
         guestPhone: createBookingDto.guestPhone || null,
         roomTypeId: createBookingDto.roomTypeId,
+        roomId: assignedRoomId, // Assign physical room here
         startTime: startTime,
-        endTime: new Date(createBookingDto.endTime),
+        endTime: endTime,
         deposit: finalDeposit,
         status: BookingStatus.PENDING,
+        notes: createBookingDto.notes || null,
       },
       include: { roomType: true, room: true },
     });
@@ -54,11 +89,18 @@ export class BookingService {
     let paymentIntent: any = null;
     if (finalDeposit > 0) {
       const provider = (createBookingDto.paymentProvider as PaymentProvider) || 'STRIPE';
-      paymentIntent = await this.paymentService.createTransaction(
-        Number(finalDeposit),
-        provider,
-        { bookingId: booking.id }
-      );
+      paymentIntent = await this.paymentService.createTransaction(Number(finalDeposit), provider, {
+        bookingId: booking.id,
+      });
+
+      // Update booking with payment session details
+      await this.prisma.booking.update({
+        where: { id: booking.id },
+        data: {
+          paymentProvider: provider,
+          paymentSessionRef: paymentIntent.transactionId,
+        },
+      });
     }
 
     return {
@@ -88,6 +130,44 @@ export class BookingService {
       whereClause.startTime = {};
       if (fromDate) whereClause.startTime.gte = new Date(fromDate);
       if (toDate) whereClause.startTime.lte = new Date(toDate);
+    }
+
+    return this.prisma.booking.findMany({
+      where: whereClause,
+      include: {
+        customer: {
+          select: {
+            id: true,
+            fullName: true,
+            phoneNumber: true,
+            imageUrl: true,
+          },
+        },
+        roomType: true,
+        room: true,
+      },
+      orderBy: { startTime: 'asc' },
+    });
+  }
+
+  //# Find all booking by custommer
+  async findByCusId(custommerId: string, query: BookingQueryDto) {
+    const { status, fromDate, toDate } = query;
+    const whereClause: Prisma.BookingWhereInput = {};
+
+    if (status) whereClause.status = status;
+    if (fromDate || toDate) {
+      whereClause.startTime = {};
+      if (fromDate) whereClause.startTime.gte = new Date(fromDate);
+      if (toDate) whereClause.startTime.lte = new Date(toDate);
+    }
+    if (custommerId) {
+      whereClause.customerId = custommerId;
+      // Cần dùng OR để tránh lỗi SQL khi notes bị NULL (NULL != string trả về False)
+      whereClause.OR = [
+        { notes: null },
+        { notes: { not: 'AUTO_CANCEL_TIMEOUT' } },
+      ];
     }
 
     return this.prisma.booking.findMany({

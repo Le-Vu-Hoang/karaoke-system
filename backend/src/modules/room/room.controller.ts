@@ -1,17 +1,17 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import {
-	ApiBadRequestResponse,
-	ApiBearerAuth,
-	ApiCreatedResponse,
-	ApiOkResponse,
-	ApiOperation,
-	ApiParam,
-	ApiResponse,
-	ApiTags,
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { RoleGuard } from '../../common/guards/role.guard';
 import { RoomService } from './room.service';
-import { Roles } from '../../common/decorations/role.decorator';
+import { AuthRoles } from '../../common/decorations/auth-roles.decorator';
 import { ApiAuthErrors } from '../../common/decorations/api-auth-error.decorator';
 import { Role } from '@prisma/client';
 import { PaginatedResponseDto } from '../../common/dto/pagination-response.dto';
@@ -26,125 +26,137 @@ import { RoomResponseDto } from './dto/room-response.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { UpdateRoomStatusDto } from './dto/update-room-status.dto';
 import { Serialize } from '../../common/interceptors/serialize.interceptor';
+import { GetAvailabilityQueryDto, AvailabilityResponseDto } from './dto/availability.dto';
 
 @ApiTags('Rooms')
 @ApiBearerAuth('JWT')
 @Controller('rooms')
 @UseGuards(RoleGuard)
 export class RoomController {
-	constructor(private readonly roomService: RoomService) {}
+  constructor(private readonly roomService: RoomService) {}
 
-	//# Create new room type
-	@Post('types')
-	@Roles(Role.ADMIN)
-	@ApiOperation({ summary: 'Tạo loại phòng mới' })
-	@ApiCreatedResponse({
-		description: 'Tạo loại phòng thành công',
-		type: RoomTypeResponseDto,
-	})
-	@ApiAuthErrors()
-	@ApiBadRequestResponse({ description: 'Dữ liệu không hợp lệ' })
-	@Serialize(RoomTypeResponseDto)
-	createNewRoomtype(@Body() body: CreateRoomTypeDto) {
-		return this.roomService.createNewType(body);
-	}
+  //# Create new room type
+  @Post('types')
+  @AuthRoles(Role.ADMIN)
+  @ApiOperation({ summary: 'Tạo loại phòng mới' })
+  @ApiCreatedResponse({
+    description: 'Tạo loại phòng thành công',
+    type: RoomTypeResponseDto,
+  })
+  @ApiAuthErrors()
+  @ApiBadRequestResponse({ description: 'Dữ liệu không hợp lệ' })
+  @Serialize(RoomTypeResponseDto)
+  createNewRoomtype(@Body() body: CreateRoomTypeDto) {
+    return this.roomService.createNewType(body);
+  }
 
-	//# Get all type of rooms
-	@Get('types')
-	@Public()
-	@ApiOperation({ summary: 'Lấy danh sách tất cả loại phòng' })
-	@ApiPaginatedResponse(RoomTypeResponseDto)
-	@ApiAuthErrors()
-	@ApiBadRequestResponse({ description: 'Dữ liệu truy vấn không hợp lệ' })
-	@Serialize(RoomTypeResponseDto)
-	getAllRoomType(@Query() query: PaginationQueryDto) {
-		return this.roomService.getAllRoomTypes(query);
-	}
+  //# Get all type of rooms
+  @Get('types')
+  @Public()
+  @ApiOperation({ summary: 'Lấy danh sách tất cả loại phòng' })
+  @ApiOkResponse({ type: [RoomTypeResponseDto] })
+  @ApiAuthErrors()
+  @Serialize(RoomTypeResponseDto)
+  getAllRoomType() {
+    return this.roomService.getAllRoomTypes();
+  }
 
-	//# Update room type info
-	@Patch('types/:id')
-	@Roles(Role.ADMIN)
-	@ApiOperation({ summary: 'Cập nhật thông tin loại phòng' })
-	@ApiParam({ name: 'id', description: 'ID của loại phòng (UUID)', type: String })
-	@ApiOkResponse({ description: 'Cập nhật thành công', type: RoomTypeResponseDto })
-	@ApiAuthErrors()
-	@ApiBadRequestResponse({ description: 'Dữ liệu không hợp lệ' })
-	@Serialize(RoomTypeResponseDto)
-	updateRoomTypeInfo(@Param('id') id: string, @Body() body: UpdateRoomTypeDto) {
-		return this.roomService.updateRoomTypeInfo(body, id);
-	}
+  //# Get availability of a room type for a specific date
+  @Get('types/:id/availability')
+  @Public()
+  @ApiOperation({ summary: 'Lấy danh sách các khung giờ ĐÃ KÍN PHÒNG của một loại phòng trong 1 ngày' })
+  @ApiParam({ name: 'id', description: 'ID của loại phòng (UUID)', type: String })
+  @ApiOkResponse({ description: 'Thành công', type: AvailabilityResponseDto })
+  @ApiAuthErrors()
+  @Serialize(AvailabilityResponseDto)
+  getRoomTypeAvailability(@Param('id') id: string, @Query() query: GetAvailabilityQueryDto) {
+    return this.roomService.getRoomTypeAvailability(id, query.date);
+  }
 
-	//# Add new room
-	@Post()
-	@Roles(Role.ADMIN)
-	@ApiOperation({ summary: 'Thêm phòng vật lý mới' })
-	@ApiCreatedResponse({ description: 'Thêm phòng thành công', type: String })
-	@ApiAuthErrors()
-	@ApiBadRequestResponse({ description: 'Dữ liệu không hợp lệ' })
-	@Serialize(RoomResponseDto)
-	addNewRoom(@Body() body: CreateRoomDto) {
-		return this.roomService.addNewRoom(body);
-	}
+  //# Update room type info
+  @Patch('types/:id')
+  @AuthRoles(Role.ADMIN)
+  @ApiOperation({ summary: 'Cập nhật thông tin loại phòng' })
+  @ApiParam({ name: 'id', description: 'ID của loại phòng (UUID)', type: String })
+  @ApiOkResponse({ description: 'Cập nhật thành công', type: RoomTypeResponseDto })
+  @ApiAuthErrors()
+  @ApiBadRequestResponse({ description: 'Dữ liệu không hợp lệ' })
+  @Serialize(RoomTypeResponseDto)
+  updateRoomTypeInfo(@Param('id') id: string, @Body() body: UpdateRoomTypeDto) {
+    return this.roomService.updateRoomTypeInfo(body, id);
+  }
 
-	//# Get all rooms
-	@Get()
-	@Roles(Role.ADMIN, Role.STAFF)
-	@ApiOperation({ summary: 'Lấy danh sách các phòng' })
-	@ApiPaginatedResponse(RoomResponseDto)
-	@ApiAuthErrors()
-	@ApiBadRequestResponse()
-	@Serialize(RoomResponseDto)
-	getAllRooms(@Query() query: PaginationQueryDto): Promise<PaginatedResponseDto<RoomResponseDto>> {
-		return this.roomService.getAllRooms(query);
-	}
+  //# Add new room
+  @Post()
+  @AuthRoles(Role.ADMIN)
+  @ApiOperation({ summary: 'Thêm phòng vật lý mới' })
+  @ApiCreatedResponse({ description: 'Thêm phòng thành công', type: String })
+  @ApiAuthErrors()
+  @ApiBadRequestResponse({ description: 'Dữ liệu không hợp lệ' })
+  @Serialize(RoomResponseDto)
+  addNewRoom(@Body() body: CreateRoomDto) {
+    return this.roomService.addNewRoom(body);
+  }
 
-	//# Get room info
-	@Get(':id')
-	@Roles(Role.ADMIN, Role.STAFF)
-	@ApiOperation({ summary: 'Lấy thông tin chi tiết một phòng' })
-	@ApiParam({ name: 'id', description: 'ID của phòng (UUID)', type: String })
-	@ApiOkResponse({ description: 'Dữ liệu chi tiết phòng', type: RoomResponseDto })
-	@ApiResponse({ status: 404, description: 'Không tìm thấy phòng' })
-	@ApiAuthErrors()
-	@Serialize(RoomResponseDto)
-	getRoomInfo(@Param('id') id: string) {
-		return this.roomService.getRoomInfo(id);
-	}
+  //# Get all rooms
+  @Get()
+  @AuthRoles(Role.ADMIN, Role.STAFF)
+  @ApiOperation({ summary: 'Lấy danh sách các phòng' })
+  @ApiPaginatedResponse(RoomResponseDto)
+  @ApiAuthErrors()
+  @ApiBadRequestResponse()
+  @Serialize(RoomResponseDto)
+  getAllRooms(@Query() query: PaginationQueryDto): Promise<PaginatedResponseDto<RoomResponseDto>> {
+    return this.roomService.getAllRooms(query);
+  }
 
-	//# Update room info
-	@Patch(':id')
-	@Roles(Role.ADMIN)
-	@ApiOperation({ summary: 'Cập nhật thông tin phòng' })
-	@ApiParam({ name: 'id', description: 'ID của phòng (UUID)', type: String })
-	@ApiOkResponse({ description: 'Cập nhật thành công', type: String })
-	@ApiAuthErrors()
-	@ApiBadRequestResponse()
-	@Serialize(RoomResponseDto)
-	updateRoomInfo(@Param('id') id: string, @Body() body: UpdateRoomDto) {
-		return this.roomService.updateRoomInfo(body, id);
-	}
+  //# Get room info
+  @Get(':id')
+  @AuthRoles(Role.ADMIN, Role.STAFF)
+  @ApiOperation({ summary: 'Lấy thông tin chi tiết một phòng' })
+  @ApiParam({ name: 'id', description: 'ID của phòng (UUID)', type: String })
+  @ApiOkResponse({ description: 'Dữ liệu chi tiết phòng', type: RoomResponseDto })
+  @ApiResponse({ status: 404, description: 'Không tìm thấy phòng' })
+  @ApiAuthErrors()
+  @Serialize(RoomResponseDto)
+  getRoomInfo(@Param('id') id: string) {
+    return this.roomService.getRoomInfo(id);
+  }
 
-	//# Update status room
-	@Patch(':id/status')
-	@Roles(Role.ADMIN, Role.STAFF)
-	@ApiOperation({ summary: 'Cập nhật nhanh trạng thái phòng (VD: Bảo trì)' })
-	@ApiParam({ name: 'id', description: 'ID của phòng (UUID)', type: String })
-	@ApiOkResponse({ description: 'Chuyển trạng thái thành công', type: String })
-	@ApiAuthErrors()
-	@ApiBadRequestResponse()
-	updateRoomStatus(@Param('id') id: string, @Body() body: UpdateRoomStatusDto) {
-		return this.roomService.updateRoomStatus(id, body.status);
-	}
+  //# Update room info
+  @Patch(':id')
+  @AuthRoles(Role.ADMIN)
+  @ApiOperation({ summary: 'Cập nhật thông tin phòng' })
+  @ApiParam({ name: 'id', description: 'ID của phòng (UUID)', type: String })
+  @ApiOkResponse({ description: 'Cập nhật thành công', type: String })
+  @ApiAuthErrors()
+  @ApiBadRequestResponse()
+  @Serialize(RoomResponseDto)
+  updateRoomInfo(@Param('id') id: string, @Body() body: UpdateRoomDto) {
+    return this.roomService.updateRoomInfo(body, id);
+  }
 
-	//# Disable room
-	@Delete(':id')
-	@Roles(Role.ADMIN)
-	@ApiOperation({ summary: 'Vô hiệu hóa (Soft Delete) phòng' })
-	@ApiParam({ name: 'id', description: 'ID của phòng (UUID)', type: String })
-	@ApiOkResponse({ description: 'Vô hiệu hóa thành công', type: String })
-	@ApiAuthErrors()
-	@ApiBadRequestResponse()
-	disableRoom(@Param('id') id: string) {
-		return this.roomService.disableRoom(id);
-	}
+  //# Update status room
+  @Patch(':id/status')
+  @AuthRoles(Role.ADMIN, Role.STAFF)
+  @ApiOperation({ summary: 'Cập nhật nhanh trạng thái phòng (VD: Bảo trì)' })
+  @ApiParam({ name: 'id', description: 'ID của phòng (UUID)', type: String })
+  @ApiOkResponse({ description: 'Chuyển trạng thái thành công', type: String })
+  @ApiAuthErrors()
+  @ApiBadRequestResponse()
+  updateRoomStatus(@Param('id') id: string, @Body() body: UpdateRoomStatusDto) {
+    return this.roomService.updateRoomStatus(id, body.status);
+  }
+
+  //# Disable room
+  @Delete(':id')
+  @AuthRoles(Role.ADMIN)
+  @ApiOperation({ summary: 'Vô hiệu hóa (Soft Delete) phòng' })
+  @ApiParam({ name: 'id', description: 'ID của phòng (UUID)', type: String })
+  @ApiOkResponse({ description: 'Vô hiệu hóa thành công', type: String })
+  @ApiAuthErrors()
+  @ApiBadRequestResponse()
+  disableRoom(@Param('id') id: string) {
+    return this.roomService.disableRoom(id);
+  }
 }
