@@ -1,0 +1,143 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@config "../tailwind.config.ts";
+
+/* ===================================
+   1. CSS Variables — Steel Dark Theme (Admin)
+=================================== */
+:root {
+  --background: #0d1117;
+  --foreground: #e6edf3;
+
+  --primary: #58a6ff;
+  --primary-foreground: #0d1117;
+
+  --secondary: #3fb950;
+  --secondary-foreground: #0d1117;
+
+  --tertiary: #d2a8ff;
+  --tertiary-foreground: #0d1117;
+
+  --muted: #161b22;
+  --muted-foreground: #8b949e;
+
+  --accent: #1f6feb;
+  --accent-foreground: #ffffff;
+
+  --destructive: #f85149;
+  --destructive-foreground: #ffffff;
+
+  --border: #30363d;
+  --input: #21262d;
+  --ring: #58a6ff;
+
+  --surface: #0d1117;
+  --surface-container-low: #161b22;
+  --surface-container: #1c2128;
+  --surface-container-high: #22272e;
+  --surface-container-highest: #2d333b;
+
+  /* Sidebar */
+  --sidebar-background: #010409;
+  --sidebar-foreground: #e6edf3;
+  --sidebar-primary: #58a6ff;
+  --sidebar-accent: #1c2128;
+  --sidebar-border: #21262d;
+
+  /* Chart */
+  --chart-1: #58a6ff;
+  --chart-2: #3fb950;
+  --chart-3: #d2a8ff;
+  --chart-4: #e3b341;
+  --chart-5: #f85149;
+
+  --radius: 0.5rem;
+}
+
+/* ===================================
+   2. Tailwind Token Mapping
+=================================== */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-tertiary: var(--tertiary);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+
+  --font-sans: var(--font-geist-sans), sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* ===================================
+   3. Base Layer Styles
+=================================== */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom scrollbar for dark admin panel */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--surface-container-low);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+  }
+}
+
+/* ===================================
+   4. Custom Utilities
+=================================== */
+@utility glass {
+  background: color-mix(in srgb, var(--surface-container) 70%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+}
+
+@utility sidebar-item {
+  @apply flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-surface-container hover:text-foreground;
+}
+
+@utility sidebar-item-active {
+  @apply bg-surface-container text-primary;
+}
+
+@utility data-badge {
+  @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium;
+}
