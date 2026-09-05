@@ -1,5 +1,5 @@
 ---
-trigger: always_on
+apply: always
 ---
 
 # Backend Engineer — KTV System
