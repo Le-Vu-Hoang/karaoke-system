@@ -19,10 +19,10 @@ import { UsersService } from '../users/users.service';
 @Injectable()
 export class AuthService {
   private readonly SALT_ROUNDS = 12;
-  
+
   // Lưu trữ các phiên QR: Map<sessionId, socketId>
   private qrSessions = new Map<string, string>();
-  
+
   // Lưu trữ Auth Codes dùng 1 lần (dùng để đổi lấy Token): Map<authCode, userId>
   private authCodes = new Map<string, string>();
 
@@ -60,12 +60,12 @@ export class AuthService {
   async generateAuthCodeForQr(userId: string): Promise<string> {
     const authCode = randomBytes(32).toString('hex');
     this.authCodes.set(authCode, userId);
-    
+
     // Tự động xóa Auth Code sau 1 phút nếu Web không kịp "đổi" (Bảo mật)
     setTimeout(() => {
       this.authCodes.delete(authCode);
     }, 60 * 1000);
-    
+
     return authCode;
   }
 
@@ -74,7 +74,7 @@ export class AuthService {
     if (!userId) {
       throw new UnauthorizedException('Mã xác thực không hợp lệ hoặc đã hết hạn');
     }
-    
+
     // Đã dùng xong thì xóa luôn để không bị dùng lại (One-time use)
     this.authCodes.delete(authCode);
 
@@ -98,7 +98,7 @@ export class AuthService {
         email: user.email || '',
         role: user.role,
         imageUrl: user.imageUrl,
-      }
+      },
     };
   }
   //# QR Login Logic - Kết thúc
@@ -262,8 +262,6 @@ export class AuthService {
     let user = await this.prisma.user.findUnique({
       where: { email: oauthUser.email },
     });
-
-
 
     if (!user) {
       user = await this.prisma.user.create({

@@ -18,7 +18,7 @@ export class QrAuthGateway implements OnGatewayDisconnect {
   @WebSocketServer()
   server!: Server;
 
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @SubscribeMessage('request-qr')
   handleRequestQr(@ConnectedSocket() client: Socket) {

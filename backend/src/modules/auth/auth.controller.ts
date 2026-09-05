@@ -1,4 +1,15 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards, Res, Get, Req, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+  Res,
+  Get,
+  Req,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
@@ -184,13 +195,13 @@ export class AuthController {
   @ApiOperation({ summary: 'Web dùng Auth Code để đổi lấy Token và Cookie' })
   async exchangeQrCode(@Body('authCode') authCode: string, @Res({ passthrough: true }) response: Response) {
     if (!authCode) throw new UnauthorizedException('Thiếu Auth Code');
-    
+
     // Đổi Auth Code lấy Token
     const result = await this.authService.exchangeAuthCode(authCode);
-    
+
     // Gài thẳng Cookie vào màn hình Web luôn
     this.setAuthCookies(response, result.accessToken, result.refreshToken);
-    
+
     return result;
   }
 }

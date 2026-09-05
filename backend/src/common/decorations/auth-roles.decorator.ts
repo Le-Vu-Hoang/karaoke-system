@@ -9,18 +9,18 @@ import { Role } from '@prisma/client';
  */
 export function AuthRoles(...roles: Role[]) {
   const rolesString = roles.join(', ');
-  
+
   return function (target: any, propertyKey?: string, descriptor?: PropertyDescriptor) {
     // 1. Áp dụng Guard phân quyền
     Roles(...roles)(target, propertyKey as any, descriptor as any);
-    
+
     // 2. Áp dụng Swagger Bearer Auth
     ApiBearerAuth('JWT')(target, propertyKey as any, descriptor as any);
-    
+
     // 3. Nếu được gắn lên Method thì mới áp dụng ApiOperation
     if (descriptor) {
-      ApiOperation({ 
-        description: `🛡️ **Quyền truy cập yêu cầu:** \`${rolesString}\`` 
+      ApiOperation({
+        description: `🛡️ **Quyền truy cập yêu cầu:** \`${rolesString}\``,
       })(target, propertyKey as any, descriptor as any);
     }
   };
