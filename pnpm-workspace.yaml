@@ -1,0 +1,5 @@
+packages:
+  - "backend"
+  - "ktv_cus"
+  - "ktv_manager"
+  - "shared"
