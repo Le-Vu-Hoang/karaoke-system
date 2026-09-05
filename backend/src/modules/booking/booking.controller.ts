@@ -126,6 +126,26 @@ export class BookingController {
     return this.bookingService.checkIn(bookingId, staffId, roomId);
   }
 
+  //# Check in for walk-in customers
+  @Post('walk-in')
+  @AuthRoles(Role.ADMIN, Role.STAFF)
+  @ApiOperation({
+    summary: 'Mở phòng cho khách vãng lai (không đặt trước)',
+  })
+  @ApiOkResponse({ type: CheckInResponseDto })
+  @ApiAuthErrors()
+  @ApiBadRequestResponse()
+  @Serialize(CheckInResponseDto)
+  walkInCheckIn(
+    @GetUser('id') staffId: string,
+    @Body('roomId') roomId: string,
+    @Body('durationHours') durationHours: number,
+    @Body('guestName') guestName?: string,
+    @Body('guestPhone') guestPhone?: string,
+  ) {
+    return this.bookingService.walkInCheckIn(roomId, staffId, durationHours, guestName, guestPhone);
+  }
+
   //# Cancel booking
   @Patch(':id/cancel')
   @AuthRoles(Role.ADMIN, Role.STAFF, Role.CUSTOMER)

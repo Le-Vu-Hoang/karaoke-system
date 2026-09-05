@@ -164,10 +164,7 @@ export class BookingService {
     if (custommerId) {
       whereClause.customerId = custommerId;
       // Cần dùng OR để tránh lỗi SQL khi notes bị NULL (NULL != string trả về False)
-      whereClause.OR = [
-        { notes: null },
-        { notes: { not: 'AUTO_CANCEL_TIMEOUT' } },
-      ];
+      whereClause.OR = [{ notes: null }, { notes: { not: 'AUTO_CANCEL_TIMEOUT' } }];
     }
 
     return this.prisma.booking.findMany({
@@ -254,6 +251,7 @@ export class BookingService {
       // 3.3. Create UNPAID Invoice
       const newInvoice = await tx.invoice.create({
         data: {
+          userId: booking.customerId,
           bookingId: bookingId,
           roomId: finalRoomId,
           staffId: staffId,
@@ -265,6 +263,64 @@ export class BookingService {
       return {
         message: 'Checked in and invoice created successfully!',
         booking: updatedBooking,
+        invoice: newInvoice,
+      };
+    });
+  }
+
+  //# Check in for walk-in custommer
+  async walkInCheckIn(roomId: string, staffId: string, durationHours: number, guestName?: string, guestPhone?: string) {
+    const room = await this.prisma.room.findUnique({
+      where: { id: roomId },
+    });
+
+    if (!room) {
+      throw new NotFoundException('Room not found');
+    }
+
+    if (room.status !== 'AVAILABLE') {
+      throw new BadRequestException('Room is not available for walk-in.');
+    }
+
+    const startTime = new Date();
+    const endTime = new Date(startTime.getTime() + durationHours * 60 * 60 * 1000);
+
+    return this.prisma.$transaction(async (tx) => {
+      // 1. Create a dummy booking for walk-in
+      const booking = await tx.booking.create({
+        data: {
+          roomTypeId: room.roomTypeId,
+          roomId: room.id,
+          startTime,
+          endTime,
+          guestName: guestName || null,
+          guestPhone: guestPhone || null,
+          status: BookingStatus.ARRIVED,
+          deposit: 0,
+          notes: 'WALK_IN',
+        },
+      });
+
+      // 2. Update room status to IN_USE
+      await tx.room.update({
+        where: { id: room.id },
+        data: { status: 'IN_USE' },
+      });
+
+      // 3. Create UNPAID Invoice
+      const newInvoice = await tx.invoice.create({
+        data: {
+          bookingId: booking.id,
+          roomId: room.id,
+          staffId,
+          status: 'UNPAID',
+          finalTotal: 0,
+        },
+      });
+
+      return {
+        message: 'Walk-in checked in and invoice created successfully!',
+        booking,
         invoice: newInvoice,
       };
     });

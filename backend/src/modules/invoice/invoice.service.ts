@@ -102,6 +102,7 @@ export class InvoiceService {
         invoiceItems: { include: { service: true } },
         room: true,
         user: { include: { membershipTier: true } },
+        booking: true,
       },
     });
 
@@ -175,7 +176,8 @@ export class InvoiceService {
       });
     }
 
-    const finalTotal = subTotal - tierDiscountAmount - voucherDiscountAmount;
+    const depositAmount = invoice.booking?.deposit ? invoice.booking.deposit.toNumber() : 0;
+    const finalTotal = subTotal - tierDiscountAmount - voucherDiscountAmount - depositAmount;
 
     return await this.prisma.invoice.update({
       where: { id },
