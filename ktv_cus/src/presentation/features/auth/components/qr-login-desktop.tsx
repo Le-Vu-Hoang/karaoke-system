@@ -18,7 +18,7 @@ export default function QrLoginDesktop() {
                 socketUrl = new URL(env.NEXT_PUBLIC_BACKEND_URL).origin;
             }
         } catch (e) {
-            console.error("Invalid NEXT_PUBLIC_BACKEND_URL:", env.NEXT_PUBLIC_BACKEND_URL);
+            console.error("Socket error: ", e);
         }
 
         const socket = io(socketUrl, {
@@ -106,7 +106,7 @@ export default function QrLoginDesktop() {
                         bgColor="#ffffff"
                         fgColor="#000000"
                         level="M"
-                        includeMargin={false}
+                        marginSize={0}
                     />
                 )}
             </div>

@@ -17,7 +17,7 @@ export const useLoginMutation = () => {
                 router.push('/');
                 toast.success(`Chào mừng quay trở lại, ${data.fullName}!`);
             },
-            onError: (error: any) => {
+            onError: (error: Error) => {
                 const errorMessage = error.message || "Tên tài khoản hoặc mật khẩu không chính xác.";
                 toast.error(`Đăng nhập thất bại: ${errorMessage}`);
             }

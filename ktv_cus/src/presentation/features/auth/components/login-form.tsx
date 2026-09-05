@@ -2,7 +2,7 @@
 
 import React, {useState} from "react";
 import {Button} from "@/presentation/shared_ui/button";
-import {Phone, Lock, Loader2} from "lucide-react"; // Đổi Mail thành Phone
+import {Phone, Lock, Loader2} from "lucide-react";
 import {useLoginMutation} from "@/presentation/features/auth/hooks/use-login";
 
 export default function LoginForm() {
@@ -29,7 +29,7 @@ export default function LoginForm() {
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     disabled={isPending}
-                    className="w-full pl-11 pr-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-lg text-on-surface placeholder:text-primary-fixed focus:outline-none focus:border-primary transition-all duration-300"
+                    className="w-full pl-11 pr-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-lg text-on-surface focus:outline-none transition-all duration-300"
                     required
                 />
             </div>
@@ -43,7 +43,7 @@ export default function LoginForm() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isPending}
-                    className="w-full pl-11 pr-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-lg text-on-surface placeholder:text-primary-fixed focus:outline-none focus:border-primary transition-all duration-300"
+                    className="w-full pl-11 pr-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-lg text-on-surface focus:outline-none transition-all duration-300"
                     required
                 />
             </div>
