@@ -1,17 +1,18 @@
+import { RoomGateway } from './gateways/room.gateway';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateRoomTypeDto } from './dto/create-room-type.dto';
-import { PaginationQueryDto } from '../../common/dto/pagination.dto';
-import { PaginatedResponseDto } from '../../common/dto/pagination-response.dto';
 import { UpdateRoomTypeDto } from './dto/update-room-type.dto';
 import { CreateRoomDto } from './dto/create-room.dto';
-import { Prisma, RoomStatus } from '@prisma/client';
+import { Prisma, RoomStatus, RoomType } from '@prisma/client';
 import { UpdateRoomDto } from './dto/update-room.dto';
-import { RoomType, Room } from '@prisma/client';
 
 @Injectable()
 export class RoomService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly roomGateway: RoomGateway,
+  ) {}
 
   async createNewType(body: CreateRoomTypeDto) {
     return await this.prisma.roomType.create({
@@ -169,46 +170,35 @@ export class RoomService {
     }
   }
 
-  async getAllRooms(query: PaginationQueryDto): Promise<PaginatedResponseDto<Room>> {
-    const page = query.page ? Number(query.page) : 1;
-    const limit = query.limit ? Number(query.limit) : undefined;
-
-    const skip = limit ? (page - 1) * limit : undefined;
-    const take = limit ? limit : undefined;
-
-    const [data, total] = await Promise.all([
-      this.prisma.room.findMany({
-        skip,
-        take,
-        where: {
-          isDeleted: false,
-        },
-        orderBy: { roomNumber: 'asc' },
-        include: {
-          roomType: true,
-        },
-      }),
-      this.prisma.room.count({
-        where: {
-          isDeleted: false,
-        },
-      }),
-    ]);
-
-    const effectiveLimit = limit || total || 1;
-    const lastPage = Math.ceil(total / effectiveLimit);
-
-    return {
-      data: data,
-      meta: {
-        total,
-        page,
-        limit: limit || total,
-        lastPage,
-        hasNextPage: page < lastPage,
-        hasPreviousPage: page > 1,
+  async getAllRooms() {
+    return await this.prisma.room.findMany({
+      where: {
+        isDeleted: false,
       },
-    };
+      orderBy: { roomNumber: 'asc' },
+      include: {
+        roomType: true,
+        invoices: {
+          where: {
+            endTime: null,
+            status: 'UNPAID',
+            isDeleted: false,
+          },
+          include: {
+            invoiceItems: {
+              include: {
+                service: true,
+              },
+            },
+            booking: {
+              include: {
+                customer: true,
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
   async getRoomInfo(id: string) {

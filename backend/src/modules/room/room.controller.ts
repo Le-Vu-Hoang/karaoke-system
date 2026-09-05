@@ -23,6 +23,7 @@ import { PaginationQueryDto } from '../../common/dto/pagination.dto';
 import { UpdateRoomTypeDto } from './dto/update-room-type.dto';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { RoomResponseDto } from './dto/room-response.dto';
+import { RoomLiveResponseDto } from './dto/room-live-response.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { UpdateRoomStatusDto } from './dto/update-room-status.dto';
 import { Serialize } from '../../common/interceptors/serialize.interceptor';
@@ -102,12 +103,12 @@ export class RoomController {
   @Get()
   @AuthRoles(Role.ADMIN, Role.STAFF)
   @ApiOperation({ summary: 'Lấy danh sách các phòng' })
-  @ApiPaginatedResponse(RoomResponseDto)
+  @ApiPaginatedResponse(RoomLiveResponseDto)
   @ApiAuthErrors()
   @ApiBadRequestResponse()
-  @Serialize(RoomResponseDto)
-  getAllRooms(@Query() query: PaginationQueryDto): Promise<PaginatedResponseDto<RoomResponseDto>> {
-    return this.roomService.getAllRooms(query);
+  @Serialize(RoomLiveResponseDto)
+  getAllRooms() {
+    return this.roomService.getAllRooms();
   }
 
   //# Get room info
