@@ -17,7 +17,7 @@ export class StripeStrategy implements PaymentStrategy {
     this.defaultCurrency = this.config.defaultCurrency || 'vnd';
 
     this.stripe = new Stripe(this.config.secretKey, {
-      apiVersion: '2026-05-27.dahlia',
+      apiVersion: '2026-07-29.dahlia',
     });
   }
 

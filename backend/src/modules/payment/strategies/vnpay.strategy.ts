@@ -41,7 +41,7 @@ export class VNPayStrategy implements PaymentStrategy {
 
     const transactionId = metadata?.bookingId || randomUUID();
     const date = new Date();
-    
+
     const yyyy = date.getFullYear().toString();
     const MM = (date.getMonth() + 1).toString().padStart(2, '0');
     const dd = date.getDate().toString().padStart(2, '0');
@@ -51,7 +51,7 @@ export class VNPayStrategy implements PaymentStrategy {
     const createDate = `${yyyy}${MM}${dd}${HH}${mm}${ss}`;
 
     const ipAddr = metadata?.ipAddr || '127.0.0.1';
-    
+
     const vnpParams: Record<string, string | number> = {
       vnp_Version: '2.1.0',
       vnp_Command: 'pay',
@@ -85,10 +85,10 @@ export class VNPayStrategy implements PaymentStrategy {
 
     const hmac = crypto.createHmac('sha512', this.secretKey);
     const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
-    
+
     const paymentUrl = new URL(this.config.vnPayUrl);
-    Object.keys(sortedParams).forEach(key => {
-        paymentUrl.searchParams.append(key, String(sortedParams[key]));
+    Object.keys(sortedParams).forEach((key) => {
+      paymentUrl.searchParams.append(key, String(sortedParams[key]));
     });
     paymentUrl.searchParams.append('vnp_SecureHash', signed);
 

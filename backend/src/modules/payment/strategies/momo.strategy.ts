@@ -49,32 +49,35 @@ export class MomoStrategy implements PaymentStrategy {
     const requestId = randomUUID();
     const requestType = 'captureWallet';
     const extraData = '';
-    
+
     // Create signature
     const rawSignature = `accessKey=${this.accessKey}&amount=${amount}&extraData=${extraData}&ipnUrl=${this.config.ipnUrl}&orderId=${orderId}&orderInfo=${orderInfo}&partnerCode=${this.partnerCode}&redirectUrl=${this.config.redirectUrl}&requestId=${requestId}&requestType=${requestType}`;
-    
+
     const signature = crypto.createHmac('sha256', this.secretKey).update(rawSignature).digest('hex');
 
     const requestBody = {
       partnerCode: this.partnerCode,
-      partnerName: "Luna Karaoke",
-      storeId: "MomoStore",
+      partnerName: 'Luna Karaoke',
+      storeId: 'MomoStore',
       requestId: requestId,
       amount: amount,
       orderId: orderId,
       orderInfo: orderInfo,
       redirectUrl: this.config.redirectUrl,
       ipnUrl: this.config.ipnUrl,
-      lang: "vi",
+      lang: 'vi',
       requestType: requestType,
       autoCapture: true,
       extraData: extraData,
-      signature: signature
+      signature: signature,
     };
 
     try {
-      const response = await axios.post(this.config.apiEndpoint || 'https://test-payment.momo.vn/v2/gateway/api/create', requestBody);
-      
+      const response = await axios.post(
+        this.config.apiEndpoint || 'https://test-payment.momo.vn/v2/gateway/api/create',
+        requestBody,
+      );
+
       if (response.data && response.data.payUrl) {
         return {
           transactionId: orderId,

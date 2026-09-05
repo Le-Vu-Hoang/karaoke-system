@@ -15,19 +15,14 @@ export class PaymentController {
   @common.Post('intent')
   @ApiOperation({ summary: 'Create a new Payment Intent' })
   @common.HttpCode(common.HttpStatus.CREATED)
-  async createIntent(
-    @common.Body() createPaymentIntentDto: CreatePaymentIntentDto,
-    @common.Req() req: any,
-  ) {
+  async createIntent(@common.Body() createPaymentIntentDto: CreatePaymentIntentDto, @common.Req() req: any) {
     const provider = (createPaymentIntentDto.provider || 'STRIPE') as 'STRIPE' | 'MOMO' | 'VNPAY';
     const metadata = {
       ...createPaymentIntentDto.metadata,
       ipAddr: req.ip || req.connection.remoteAddress || '127.0.0.1',
     };
 
-    return this.commandBus.execute(
-      new CreatePaymentIntentCommand(createPaymentIntentDto.amount, provider, metadata),
-    );
+    return this.commandBus.execute(new CreatePaymentIntentCommand(createPaymentIntentDto.amount, provider, metadata));
   }
 
   @Public()
@@ -61,7 +56,7 @@ export class PaymentController {
     try {
       // 4. Dispatch Command xử lý Webhook
       await this.commandBus.execute(new ProcessPaymentWebhookCommand(provider, payload, signature));
-      
+
       if (provider.toUpperCase() === 'VNPAY') {
         return { RspCode: '00', Message: 'Confirm Success' };
       }
