@@ -8,13 +8,13 @@ import { useState, type ReactNode, useEffect } from "react";
 import { useAuthStore } from "@/shared/stores/use-auth-store";
 
 function AuthSync() {
-  const clearUser = useAuthStore((s) => s.clearUser);
+  const logout = useAuthStore((s) => s.logout);
 
   useEffect(() => {
-    const handler = () => clearUser();
+    const handler = () => logout();
     window.addEventListener("auth-logout", handler);
     return () => window.removeEventListener("auth-logout", handler);
-  }, [clearUser]);
+  }, [logout]);
 
   return null;
 }

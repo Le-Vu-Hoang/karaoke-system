@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
     LIST: "/bookings",
     DETAILS: (id: string) => `/bookings/${id}`,
     CHECKIN: (id: string) => `/bookings/${id}/check-in`,
+    WALK_IN_CHECKIN: "/bookings/walk-in",
     CANCEL: (id: string) => `/bookings/${id}/cancel`,
     CONFIRM: (id: string) => `/bookings/${id}/confirm`,
   },

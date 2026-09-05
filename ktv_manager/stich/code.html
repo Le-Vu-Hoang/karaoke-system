@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bảng Điều Khiển Lễ Tân - Luna Karaoke</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&amp;family=Sora:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-tertiary": "#00363a",
+                "on-tertiary-container": "#ffffff",
+                "on-secondary-fixed": "#3f0019",
+                "primary-fixed-dim": "#ecb2ff",
+                "surface": "#0b1326",
+                "background": "#0b1326",
+                "inverse-surface": "#dae2fd",
+                "error": "#ffb4ab",
+                "primary": "#ecb2ff",
+                "tertiary-fixed": "#7df4ff",
+                "tertiary-container": "#00838b",
+                "on-tertiary-fixed-variant": "#004f54",
+                "tertiary": "#00dbe9",
+                "on-secondary": "#66002c",
+                "surface-container": "#171f33",
+                "on-secondary-container": "#590026",
+                "surface-bright": "#31394d",
+                "on-surface-variant": "#d4c0d7",
+                "primary-container": "#bd00ff",
+                "on-surface": "#dae2fd",
+                "error-container": "#93000a",
+                "primary-fixed": "#f8d8ff",
+                "on-primary-fixed-variant": "#74009f",
+                "on-primary-fixed": "#320047",
+                "surface-dim": "#0b1326",
+                "surface-container-high": "#222a3d",
+                "on-error": "#690005",
+                "surface-variant": "#2d3449",
+                "on-secondary-fixed-variant": "#8f0041",
+                "surface-container-low": "#131b2e",
+                "on-background": "#dae2fd",
+                "inverse-primary": "#9900cf",
+                "secondary-fixed": "#ffd9e0",
+                "secondary": "#ffb1c3",
+                "surface-tint": "#ecb2ff",
+                "inverse-on-surface": "#283044",
+                "outline-variant": "#514255",
+                "on-primary": "#520071",
+                "surface-container-lowest": "#060e20",
+                "tertiary-fixed-dim": "#00dbe9",
+                "secondary-container": "#ff4b89",
+                "secondary-fixed-dim": "#ffb1c3",
+                "on-tertiary-fixed": "#002022",
+                "outline": "#9d8ba0",
+                "on-primary-container": "#ffffff",
+                "on-error-container": "#ffdad6",
+                "surface-container-highest": "#2d3449",
+                "status-green": "#00E676",
+                "status-blue": "#00B0FF",
+                "status-red": "#FF1744",
+                "status-yellow": "#FFEA00"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "margin": "32px",
+                "lg": "48px",
+                "base": "8px",
+                "sm": "12px",
+                "xl": "80px",
+                "gutter": "24px",
+                "md": "24px",
+                "xs": "4px"
+        },
+        "fontFamily": {
+                "body-lg": [
+                        "Hanken Grotesk"
+                ],
+                "headline-md": [
+                        "Sora"
+                ],
+                "body-md": [
+                        "Hanken Grotesk"
+                ],
+                "label-md": [
+                        "Hanken Grotesk"
+                ],
+                "headline-lg-mobile": [
+                        "Sora"
+                ],
+                "label-sm": [
+                        "Hanken Grotesk"
+                ],
+                "headline-lg": [
+                        "Sora"
+                ],
+                "headline-xl": [
+                        "Sora"
+                ]
+        },
+        "fontSize": {
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-md": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "28px",
+                        {
+                                "lineHeight": "36px",
+                                "fontWeight": "700"
+                        }
+                ],
+                "label-sm": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "fontWeight": "500"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "headline-xl": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "800"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+          .glass-panel {
+              background: rgba(11, 19, 38, 0.6);
+              backdrop-filter: blur(16px);
+              -webkit-backdrop-filter: blur(16px);
+              border: 1px solid rgba(255, 255, 255, 0.05);
+          }
+          .room-card {
+              transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+          .room-card:hover {
+              transform: translateY(-2px);
+          }
+          .bg-noise {
+              background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+          }
+          /* Custom Scrollbar for room grid */
+          .custom-scrollbar::-webkit-scrollbar {
+              width: 8px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-track {
+              background: rgba(255, 255, 255, 0.05);
+              border-radius: 4px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb {
+              background: rgba(255, 255, 255, 0.2);
+              border-radius: 4px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+              background: rgba(255, 255, 255, 0.3);
+          }
+      </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen bg-noise flex flex-col font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+<aside class="fixed left-0 top-0 h-full w-64 bg-surface/80 backdrop-blur-xl border-r border-outline-variant/20 shadow-[0_0_20px_rgba(189,0,255,0.15)] z-50 flex flex-col p-md">
+<div class="flex items-center gap-sm mb-xl">
+<span class="material-symbols-outlined text-primary" data-icon="mic_external_on">mic_external_on</span>
+<span class="font-headline-md text-[20px] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">LUNA KARAOKE</span>
+</div>
+<nav class="flex flex-col gap-sm flex-grow">
+<a class="flex items-center gap-sm p-3 rounded-lg bg-primary/10 text-primary font-bold border-l-2 border-primary" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span> Bảng điều khiển
+    </a>
+<a class="flex items-center gap-sm p-3 rounded-lg text-on-surface-variant font-medium hover:bg-surface-bright hover:text-secondary transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span> Đặt phòng
+    </a>
+<a class="flex items-center gap-sm p-3 rounded-lg text-on-surface-variant font-medium hover:bg-surface-bright hover:text-secondary transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="meeting_room">meeting_room</span> Sơ đồ phòng
+    </a>
+<a class="flex items-center gap-sm p-3 rounded-lg text-on-surface-variant font-medium hover:bg-surface-bright hover:text-secondary transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span> Báo cáo
+    </a>
+<a class="flex items-center gap-sm p-3 rounded-lg text-on-surface-variant font-medium hover:bg-surface-bright hover:text-secondary transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span> Cài đặt
+    </a>
+</nav>
+<div class="mt-auto pt-md border-t border-outline-variant/20 flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="account_circle">account_circle</span>
+<div class="flex flex-col">
+<span class="text-label-md text-on-surface font-bold">Quản trị viên</span>
+<span class="text-label-sm text-on-surface-variant">Lễ tân</span>
+</div>
+</div>
+</aside>
+<main class="flex-grow ml-64 p-margin pb-xl max-w-[calc(1920px-256px)] w-full grid grid-cols-1 lg:grid-cols-4 gap-gutter">
+<section class="lg:col-span-3 flex flex-col gap-md h-[calc(100vh-140px)]">
+<div class="flex justify-between items-end mb-sm flex-shrink-0">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Sơ đồ phòng</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Tổng quan trạng thái các phòng VIP và tiêu chuẩn theo thời gian thực.</p>
+</div>
+<div class="flex gap-sm">
+<div class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-status-red shadow-[0_0_10px_rgba(255,23,68,0.6)]"></span><span class="font-label-sm text-label-sm text-on-surface-variant">Đang hát</span></div>
+<div class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-status-green shadow-[0_0_10px_rgba(0,230,118,0.6)]"></span><span class="font-label-sm text-label-sm text-on-surface-variant">Sẵn sàng</span></div>
+<div class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-status-yellow shadow-[0_0_10px_rgba(255,234,0,0.6)]"></span><span class="font-label-sm text-label-sm text-on-surface-variant">Chờ dọn dẹp</span></div>
+<div class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-status-blue shadow-[0_0_10px_rgba(0,176,255,0.6)]"></span><span class="font-label-sm text-label-sm text-on-surface-variant">Bảo trì</span></div>
+</div>
+</div>
+<!-- Filter Bar -->
+<div class="flex gap-sm mb-2 flex-shrink-0 items-center">
+<div class="flex-grow max-w-md relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full pl-10 pr-3 py-2 bg-surface-container border border-outline-variant/30 text-on-surface text-label-md rounded-lg focus:ring-primary focus:border-primary" placeholder="Tìm kiếm phòng, tên khách..." type="text"/>
+</div>
+<select class="bg-surface-container border border-outline-variant/30 text-on-surface text-label-md rounded-lg py-2 px-3 focus:ring-primary focus:border-primary">
+<option>Tất cả loại phòng</option>
+<option>Phòng VIP</option>
+<option>Phòng Tiêu chuẩn</option>
+<option>Phòng Lớn</option>
+</select>
+<select class="bg-surface-container border border-outline-variant/30 text-on-surface text-label-md rounded-lg py-2 px-3 focus:ring-primary focus:border-primary">
+<option>Tất cả trạng thái</option>
+<option>Đang hát</option>
+<option>Sẵn sàng</option>
+<option>Chờ dọn dẹp</option>
+<option>Bảo trì</option>
+</select>
+</div>
+<!-- Scrollable Grid for Rooms -->
+<div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-sm overflow-y-auto custom-scrollbar pb-4 pr-2 flex-grow">
+<!-- Room 101 - In Use (Red) -->
+<div class="glass-panel rounded-xl p-md flex flex-col justify-between h-[250px] room-card border-status-red/50 shadow-[0_0_15px_rgba(255,23,68,0.2)] relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-full h-1 bg-status-red shadow-[0_0_10px_rgba(255,23,68,0.8)]"></div>
+<div class="absolute -right-10 -top-10 w-32 h-32 bg-status-red/10 rounded-full blur-2xl"></div>
+<div class="flex justify-between items-start z-10">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">101</h3>
+<span class="font-label-sm text-label-sm text-status-red tracking-widest uppercase mt-xs block">Phòng VIP</span>
+</div>
+<div class="bg-status-red/10 text-status-red border border-status-red/30 px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]" data-icon="mic" style="font-variation-settings: 'FILL' 1;">mic</span>
+                             Đang hát
+                        </div>
+</div>
+<div class="z-10 mt-auto">
+<div class="flex items-center justify-between mb-1">
+<span class="font-body-md text-body-md text-on-surface flex items-center gap-xs font-bold animate-pulse"><span class="material-symbols-outlined text-[16px] text-status-red" data-icon="timer">timer</span> 01:45:20</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Nhóm 6 người</span>
+</div>
+<div class="mb-sm text-right">
+<span class="font-label-sm text-label-sm text-status-red font-bold">Tạm tính: 1,450,000đ</span>
+</div>
+<div class="grid grid-cols-2 gap-xs">
+<button class="bg-surface-variant hover:bg-surface-bright text-on-surface font-label-md text-label-md py-2 rounded-lg transition-colors border border-outline-variant/30 text-center">Gọi món</button>
+<button class="bg-status-red text-surface font-label-md text-label-md py-2 rounded-lg transition-transform hover:scale-[1.02] active:scale-95 shadow-[0_0_10px_rgba(255,23,68,0.4)] text-center font-bold">Thanh toán</button>
+</div>
+</div>
+</div>
+<!-- Room 102 - Available (Green) -->
+<div class="glass-panel rounded-xl p-md flex flex-col justify-between h-[250px] room-card border-status-green/30 hover:border-status-green/60 transition-colors relative overflow-hidden group">
+<div class="absolute -right-10 -top-10 w-32 h-32 bg-status-green/10 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="flex justify-between items-start z-10">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">102</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant tracking-widest uppercase mt-xs block">Tiêu chuẩn</span>
+</div>
+<div class="bg-status-green/10 text-status-green border border-status-green/30 px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                             Sẵn sàng
+                        </div>
+</div>
+<div class="z-10 mt-auto">
+<div class="flex items-center justify-between mb-sm opacity-50">
+<span class="font-body-md text-body-md text-on-surface-variant flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]" data-icon="timer">timer</span> --:--:--</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Sức chứa: 4</span>
+</div>
+<button class="w-full bg-surface-variant hover:bg-status-green/20 hover:text-status-green hover:border-status-green/50 border border-outline-variant/30 text-on-surface font-label-md text-label-md py-2 rounded-lg transition-all duration-300 text-center flex justify-center items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="login">login</span> Nhận phòng
+                        </button>
+</div>
+</div>
+<!-- Room 103 - Clearing (Yellow) -->
+<div class="glass-panel rounded-xl p-md flex flex-col justify-between h-[250px] room-card border-status-yellow/40 relative overflow-hidden group shadow-[0_0_10px_rgba(255,234,0,0.1)]">
+<div class="flex justify-between items-start z-10">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">103</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant tracking-widest uppercase mt-xs block">Phòng Lớn</span>
+</div>
+<div class="bg-status-yellow/10 text-status-yellow border border-status-yellow/30 px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-xs animate-pulse">
+<span class="material-symbols-outlined text-[14px]" data-icon="cleaning_services" style="font-variation-settings: 'FILL' 1;">cleaning_services</span>
+                             Chờ dọn
+                        </div>
+</div>
+<div class="z-10 mt-auto">
+<div class="flex items-center justify-between mb-sm">
+<span class="font-body-md text-body-md text-on-surface-variant flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]" data-icon="hourglass_empty">hourglass_empty</span> Dự kiến 10p</span>
+<span class="font-body-md text-body-md text-on-surface-variant">NV: Jen</span>
+</div>
+<button class="w-full bg-surface-variant hover:bg-status-yellow/20 hover:text-status-yellow border border-outline-variant/30 hover:border-status-yellow/50 text-on-surface font-label-md text-label-md py-2 rounded-lg transition-all duration-300 text-center">
+                            Hoàn thành
+                        </button>
+</div>
+</div>
+<!-- Room 104 - Maintenance (Blue) -->
+<div class="glass-panel rounded-xl p-md flex flex-col justify-between h-[250px] room-card border-status-blue/30 bg-surface-container/50">
+<div class="flex justify-between items-start z-10">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface-variant">104</h3>
+<span class="font-label-sm text-label-sm text-outline tracking-widest uppercase mt-xs block">Tiêu chuẩn</span>
+</div>
+<div class="bg-status-blue/10 text-status-blue border border-status-blue/30 px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]" data-icon="build" style="font-variation-settings: 'FILL' 1;">build</span>
+                             Bảo trì
+                        </div>
+</div>
+<div class="z-10 mt-auto">
+<div class="flex items-center justify-between mb-sm">
+<span class="font-body-md text-body-md text-outline flex items-center gap-xs"><span class="material-symbols-outlined text-[16px] text-status-blue" data-icon="report">report</span> Hệ thống âm thanh</span>
+</div>
+<button class="w-full bg-surface-container-lowest text-outline font-label-md text-label-md py-2 rounded-lg cursor-not-allowed border border-outline-variant/10 text-center">
+                            Không khả dụng
+                        </button>
+</div>
+</div>
+<!-- Room 105 - Available -->
+<div class="glass-panel rounded-xl p-md flex flex-col justify-between h-[250px] room-card border-status-green/30 hover:border-status-green/60 transition-colors relative overflow-hidden group">
+<div class="flex justify-between items-start z-10">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">105</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant tracking-widest uppercase mt-xs block">Phòng VIP</span>
+</div>
+<div class="bg-status-green/10 text-status-green border border-status-green/30 px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                             Sẵn sàng
+                        </div>
+</div>
+<div class="z-10 mt-auto">
+<button class="w-full bg-surface-variant hover:bg-status-green/20 hover:text-status-green hover:border-status-green/50 border border-outline-variant/30 text-on-surface font-label-md text-label-md py-2 rounded-lg transition-all duration-300 text-center flex justify-center items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="login">login</span> Nhận phòng
+                        </button>
+</div>
+</div>
+<!-- Room 106 - In Use -->
+<div class="glass-panel rounded-xl p-md flex flex-col justify-between h-[250px] room-card border-status-red/50 shadow-[0_0_15px_rgba(255,23,68,0.2)] relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-full h-1 bg-status-red shadow-[0_0_10px_rgba(255,23,68,0.8)]"></div>
+<div class="flex justify-between items-start z-10">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">106</h3>
+<span class="font-label-sm text-label-sm text-status-red tracking-widest uppercase mt-xs block">Tiêu chuẩn</span>
+</div>
+<div class="bg-status-red/10 text-status-red border border-status-red/30 px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]" data-icon="mic" style="font-variation-settings: 'FILL' 1;">mic</span>
+                             Đang hát
+                        </div>
+</div>
+<div class="z-10 mt-auto">
+<div class="flex items-center justify-between mb-1">
+<span class="font-body-md text-body-md text-on-surface flex items-center gap-xs font-bold animate-pulse"><span class="material-symbols-outlined text-[16px] text-status-red" data-icon="timer">timer</span> 00:25:12</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Nhóm 2 người</span>
+</div>
+<div class="mb-sm text-right">
+<span class="font-label-sm text-label-sm text-status-red font-bold">Tạm tính: 320,000đ</span>
+</div>
+<div class="grid grid-cols-2 gap-xs">
+<button class="bg-surface-variant hover:bg-surface-bright text-on-surface font-label-md text-label-md py-2 rounded-lg transition-colors border border-outline-variant/30 text-center">Gọi món</button>
+<button class="bg-status-red text-surface font-label-md text-label-md py-2 rounded-lg transition-transform hover:scale-[1.02] active:scale-95 shadow-[0_0_10px_rgba(255,23,68,0.4)] text-center font-bold">Thanh toán</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Notifications & Requests Section (Below Grid) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-sm mt-sm flex-shrink-0">
+<!-- Upcoming Bookings -->
+<div class="glass-panel rounded-xl p-md border-outline-variant/20 h-48 overflow-y-auto custom-scrollbar">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-sm flex items-center gap-xs sticky top-0 bg-surface/90 pb-2 z-10">
+<span class="material-symbols-outlined text-secondary" data-icon="event_upcoming">event_upcoming</span> 2 giờ tới
+        </h2>
+<div class="space-y-3">
+<div class="bg-surface-container hover:bg-surface-bright transition-colors p-3 rounded-lg border border-outline-variant/10 cursor-pointer border-l-2 border-l-secondary">
+<div class="flex justify-between items-start mb-1">
+<span class="font-label-md text-label-md text-on-surface font-bold">Nguyễn Văn A</span>
+<span class="font-label-sm text-label-sm text-secondary bg-secondary/10 px-2 py-0.5 rounded">19:30</span>
+</div>
+<div class="flex justify-between items-end">
+<span class="font-body-md text-body-md text-on-surface-variant text-sm">Phòng VIP - 8 người</span>
+<span class="font-label-sm text-label-sm text-tertiary">Đã thanh toán</span>
+</div>
+</div>
+<div class="bg-surface-container hover:bg-surface-bright transition-colors p-3 rounded-lg border border-outline-variant/10 cursor-pointer border-l-2 border-l-tertiary">
+<div class="flex justify-between items-start mb-1">
+<span class="font-label-md text-label-md text-on-surface font-bold">Trần Thị B</span>
+<span class="font-label-sm text-label-sm text-tertiary bg-tertiary/10 px-2 py-0.5 rounded">20:00</span>
+</div>
+<div class="flex justify-between items-end">
+<span class="font-body-md text-body-md text-on-surface-variant text-sm">Tiêu chuẩn - 4 người</span>
+<span class="font-label-sm text-label-sm text-outline">Chưa thanh toán</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Service Requests -->
+<div class="glass-panel rounded-xl p-md border-outline-variant/20 h-48 overflow-y-auto custom-scrollbar">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-sm flex items-center gap-xs sticky top-0 bg-surface/90 pb-2 z-10">
+<span class="material-symbols-outlined text-status-yellow" data-icon="room_service">room_service</span> Yêu cầu dịch vụ
+        </h2>
+<ul class="space-y-3">
+<li class="bg-status-yellow/10 p-3 rounded-lg border border-status-yellow/20 flex gap-sm items-start">
+<span class="material-symbols-outlined text-status-yellow mt-1 text-[20px]" data-icon="notifications_active">notifications_active</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface font-bold">Phòng 101 gọi dịch vụ</p>
+<span class="font-label-sm text-label-sm text-status-yellow">Vừa xong</span>
+</div>
+</li>
+<li class="bg-surface-container p-3 rounded-lg border border-outline-variant/10 flex gap-sm items-start">
+<span class="material-symbols-outlined text-primary mt-1 text-[20px]" data-icon="local_bar">local_bar</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface font-bold">Gọi đồ uống - Phòng 106</p>
+<span class="font-label-sm text-label-sm text-on-surface-variant">5 phút trước</span>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- Right Sidebar -->
+<aside class="lg:col-span-1 flex flex-col gap-sm h-full">
+<!-- Shift Status (Dedicated) -->
+<div class="glass-panel rounded-xl p-md border-primary/30 shadow-[0_0_25px_rgba(189,0,255,0.1)] relative overflow-hidden flex flex-col h-full bg-surface-container-low/80 backdrop-blur-2xl">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-container/10 rounded-full blur-3xl"></div>
+<div class="absolute bottom-0 left-0 w-40 h-40 bg-secondary/5 rounded-full blur-3xl"></div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-lg flex items-center gap-xs pb-4 border-b border-outline-variant/20 relative z-10">
+<span class="material-symbols-outlined text-primary text-[28px]" data-icon="admin_panel_settings">admin_panel_settings</span> Trạng thái ca
+</h2>
+<div class="space-y-6 relative z-10 flex-grow">
+<div class="bg-surface-container p-4 rounded-xl border border-outline-variant/10">
+<p class="font-body-md text-body-md text-on-surface-variant mb-1">Thời gian</p>
+<p class="font-headline-md text-headline-md text-on-surface font-bold text-status-green flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-status-green animate-pulse"></span> Đang hoạt động 4h 12m
+    </p>
+</div>
+<div class="bg-surface-container p-4 rounded-xl border border-outline-variant/10 flex flex-col gap-2">
+<div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-1">Tiền mặt trong két</p>
+<p class="font-headline-lg text-headline-lg text-tertiary font-bold tracking-wide">15,240,000đ</p>
+</div>
+<button class="w-full mt-2 bg-surface-variant hover:bg-surface-bright text-on-surface text-label-md py-2 rounded-lg border border-outline-variant/30 flex items-center justify-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="sync_alt">sync_alt</span> +/- Giao dịch két
+    </button>
+</div>
+<div class="bg-surface-container p-4 rounded-xl border border-outline-variant/10">
+<p class="font-body-md text-body-md text-on-surface-variant mb-1">Thanh toán Online</p>
+<p class="font-headline-md text-headline-md text-on-surface font-bold tracking-wide">4,500,000đ</p>
+</div>
+</div>
+<div class="mt-auto pt-6 relative z-10">
+<button class="w-full bg-gradient-to-r from-primary-container to-inverse-primary text-on-primary-container font-headline-md text-[20px] py-4 rounded-xl transition-all hover:scale-[1.02] active:scale-95 shadow-[0_0_20px_rgba(189,0,255,0.4)] font-bold tracking-wider hover:shadow-[0_0_30px_rgba(189,0,255,0.6)]">
+    KẾT THÚC CA
+</button>
+</div>
+</div>
+</aside>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest w-full py-lg mt-auto border-t border-outline-variant/10 ml-64">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin max-w-7xl mx-auto">
+<div>
+<span class="font-headline-md text-headline-md text-primary block mb-sm">LUNA KARAOKE</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 LUNA KARAOKE. SING YOUR HEART OUT.</p>
+</div>
+<div class="flex flex-col gap-2">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all" href="#">Chính sách bảo mật</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all" href="#">Điều khoản dịch vụ</a>
+</div>
+<div class="flex flex-col gap-2">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all" href="#">Đối tác địa điểm</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all" href="#">Hỗ trợ liên hệ</a>
+</div>
+</div>
+</footer>
+</body></html>

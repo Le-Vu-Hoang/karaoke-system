@@ -2,84 +2,127 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-
 @config "../tailwind.config.ts";
 
-/* ===================================
-   1. CSS Variables — Steel Dark Theme (Admin)
-=================================== */
+/* ==========================================
+   1. CẤU HÌNH PHẢN HỒI MÀU SHADCN (CSS VARIABLES)
+      Đồng bộ Neon Pulse (Midnight Base & Electric Accents)
+   ========================================== */
 :root {
-  --background: #0d1117;
-  --foreground: #e6edf3;
+  --background: #0b1326;
+  --foreground: #dae2fd;
+  --card: #131b2e;
+  --card-foreground: #dae2fd;
+  --popover: #171f33;
+  --popover-foreground: #dae2fd;
 
-  --primary: #58a6ff;
-  --primary-foreground: #0d1117;
+  --primary: #ecb2ff;
+  --primary-foreground: #520071;
 
-  --secondary: #3fb950;
-  --secondary-foreground: #0d1117;
+  --secondary: #ffb1c3;
+  --secondary-foreground: #66002c;
 
-  --tertiary: #d2a8ff;
-  --tertiary-foreground: #0d1117;
+  --muted: #2d3449;
+  --muted-foreground: #9d8ba0;
 
-  --muted: #161b22;
-  --muted-foreground: #8b949e;
+  --accent: #222a3d;
+  --accent-foreground: #dae2fd;
 
-  --accent: #1f6feb;
-  --accent-foreground: #ffffff;
+  --destructive: #ffb4ab;
+  --destructive-foreground: #690005;
 
-  --destructive: #f85149;
-  --destructive-foreground: #ffffff;
-
-  --border: #30363d;
-  --input: #21262d;
-  --ring: #58a6ff;
-
-  --surface: #0d1117;
-  --surface-container-low: #161b22;
-  --surface-container: #1c2128;
-  --surface-container-high: #22272e;
-  --surface-container-highest: #2d333b;
-
-  /* Sidebar */
-  --sidebar-background: #010409;
-  --sidebar-foreground: #e6edf3;
-  --sidebar-primary: #58a6ff;
-  --sidebar-accent: #1c2128;
-  --sidebar-border: #21262d;
-
-  /* Chart */
-  --chart-1: #58a6ff;
-  --chart-2: #3fb950;
-  --chart-3: #d2a8ff;
-  --chart-4: #e3b341;
-  --chart-5: #f85149;
-
+  --border: #514255;
+  --input: #514255;
+  --ring: #ecb2ff;
   --radius: 0.5rem;
+
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+
+  /* Bảng màu bổ sung để tương thích UI Staff */
+  --surface: #0b1326;
+  --surface-container-low: #131b2e;
+  --surface-container: #171f33;
+  --surface-container-high: #222a3d;
+  --surface-container-highest: #2d3449;
+  
+  --sidebar-background: #060e20;
+  --sidebar-foreground: #dae2fd;
+  --sidebar-primary: #ecb2ff;
+  --sidebar-accent: #171f33;
+  --sidebar-border: #514255;
 }
 
-/* ===================================
-   2. Tailwind Token Mapping
-=================================== */
+/* Kính kích hoạt dark mode - đồng bộ các biến màu */
+.dark {
+  --background: #0b1326;
+  --foreground: #dae2fd;
+  --card: #131b2e;
+  --card-foreground: #dae2fd;
+  --popover: #171f33;
+  --popover-foreground: #dae2fd;
+
+  --primary: #ecb2ff;
+  --primary-foreground: #520071;
+
+  --secondary: #ffb1c3;
+  --secondary-foreground: #66002c;
+
+  --muted: #2d3449;
+  --muted-foreground: #9d8ba0;
+
+  --accent: #222a3d;
+  --accent-foreground: #dae2fd;
+
+  --destructive: #ffb4ab;
+  --destructive-foreground: #690005;
+
+  --border: #514255;
+  --input: #514255;
+  --ring: #ecb2ff;
+}
+
+/* ==========================================
+   2. LIÊN KẾT BIẾN CSS VÀO TAILWIND V4 THEME
+   ========================================== */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  --color-tertiary: var(--tertiary);
+
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
   --color-surface-container-low: var(--surface-container-low);
   --color-surface-container: var(--surface-container);
   --color-surface-container-high: var(--surface-container-high);
   --color-surface-container-highest: var(--surface-container-highest);
+
+  --color-on-surface: #dae2fd;
+  --color-on-surface-variant: #d4c0d7;
+  --color-outline-variant: #514255;
 
   --font-sans: var(--font-geist-sans), sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
