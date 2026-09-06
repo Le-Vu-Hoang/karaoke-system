@@ -271,6 +271,8 @@ export class RoomService {
       },
     });
 
+    this.roomGateway.emitRoomStatusChanged(id);
+
     return { message: 'Room status updated successfully!' };
   }
 
@@ -293,6 +295,8 @@ export class RoomService {
         isDeleted: true,
       },
     });
+
+    this.roomGateway.emitRoomStatusChanged(id);
 
     return { message: 'Room disabled successfully!' };
   }

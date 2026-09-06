@@ -7,6 +7,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 import { PricingService } from '../pricing/pricing.service';
 import { PaymentService, PaymentProvider } from '../payment/payment.service';
+import { RoomGateway } from '../room/gateways/room.gateway';
 
 @Injectable()
 export class BookingService {
@@ -14,6 +15,7 @@ export class BookingService {
     private readonly prisma: PrismaService,
     private readonly pricingService: PricingService,
     private readonly paymentService: PaymentService,
+    private readonly roomGateway: RoomGateway,
   ) {}
 
   //# Create new booking for user
@@ -230,7 +232,7 @@ export class BookingService {
     }
 
     //< 3. EXECUTION via Transaction
-    return this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       // 3.1. Update booking status to ARRIVED
       const updatedBooking = await tx.booking.update({
         where: { id: bookingId },
@@ -266,6 +268,10 @@ export class BookingService {
         invoice: newInvoice,
       };
     });
+
+    this.roomGateway.emitRoomStatusChanged(finalRoomId);
+
+    return result;
   }
 
   //# Check in for walk-in custommer
@@ -285,7 +291,7 @@ export class BookingService {
     const startTime = new Date();
     const endTime = new Date(startTime.getTime() + durationHours * 60 * 60 * 1000);
 
-    return this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       // 1. Create a dummy booking for walk-in
       const booking = await tx.booking.create({
         data: {
@@ -324,6 +330,10 @@ export class BookingService {
         invoice: newInvoice,
       };
     });
+
+    this.roomGateway.emitRoomStatusChanged(room.id);
+
+    return result;
   }
 
   //# Cancel booking
@@ -339,7 +349,7 @@ export class BookingService {
     }
 
     //< 2. Transaction for canceling and releasing room
-    return this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       // 2.1 Update booking to CANCELLED
       const cancelledBooking = await tx.booking.update({
         where: { id },
@@ -356,5 +366,11 @@ export class BookingService {
 
       return cancelledBooking;
     });
+
+    if (booking.roomId) {
+      this.roomGateway.emitRoomStatusChanged(booking.roomId);
+    }
+
+    return result;
   }
 }
